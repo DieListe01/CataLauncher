@@ -1,7 +1,7 @@
 using System.IO;
-using Catan.WpfLauncher.Models;
+using CatanLauncher.Models;
 
-namespace Catan.WpfLauncher.Services;
+namespace CatanLauncher.Services;
 
 public sealed class LauncherConfigService
 {

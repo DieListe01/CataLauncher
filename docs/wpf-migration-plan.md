@@ -28,7 +28,7 @@ Die aktuelle Datei `Catan/CatanLauncher.cs` enthaelt sehr viel UI- und Fachlogik
 
 ## Phase 2 - WPF-Grundstruktur
 
-Neues Projekt: `Catan.WpfLauncher`
+Neues Projekt: `CatanLauncher`
 
 Struktur:
 

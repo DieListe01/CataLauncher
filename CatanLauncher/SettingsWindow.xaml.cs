@@ -5,9 +5,9 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
-using Catan.WpfLauncher.Models;
+using CatanLauncher.Models;
 
-namespace Catan.WpfLauncher;
+namespace CatanLauncher;
 
 public partial class SettingsWindow : Window
 {

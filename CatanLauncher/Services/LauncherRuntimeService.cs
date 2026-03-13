@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace Catan.WpfLauncher.Services;
+namespace CatanLauncher.Services;
 
 public sealed class LauncherRuntimeService
 {

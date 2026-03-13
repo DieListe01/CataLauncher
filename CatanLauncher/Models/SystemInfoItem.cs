@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Catan.WpfLauncher.Models;
+namespace CatanLauncher.Models;
 
 public sealed class SystemInfoItem
 {

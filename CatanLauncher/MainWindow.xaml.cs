@@ -8,10 +8,10 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Catan.WpfLauncher.Models;
-using Catan.WpfLauncher.Services;
+using CatanLauncher.Models;
+using CatanLauncher.Services;
 
-namespace Catan.WpfLauncher;
+namespace CatanLauncher;
 
 public partial class MainWindow : Window
 {

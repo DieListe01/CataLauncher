@@ -1,7 +1,7 @@
 using System.Windows;
-using Catan.WpfLauncher.Services;
+using CatanLauncher.Services;
 
-namespace Catan.WpfLauncher;
+namespace CatanLauncher;
 
 public partial class App : Application
 {

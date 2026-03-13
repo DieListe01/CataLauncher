@@ -1,4 +1,4 @@
-namespace Catan.WpfLauncher.Models;
+namespace CatanLauncher.Models;
 
 public sealed class LauncherConfig
 {

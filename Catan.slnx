@@ -3,5 +3,5 @@
     <File Path="docs/wpf-migration-plan.md" />
     <File Path="docs/wpf-wireframe.md" />
   </Folder>
-  <Project Path="Catan.WpfLauncher/Catan_Launcher.csproj" />
+  <Project Path="CatanLauncher/CatanLauncher.csproj" />
 </Solution>

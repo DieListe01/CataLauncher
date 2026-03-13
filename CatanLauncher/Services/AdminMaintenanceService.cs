@@ -3,11 +3,11 @@ using System.IO;
 using System.Security.Principal;
 using System.Text;
 
-namespace Catan.WpfLauncher.Services;
+namespace CatanLauncher.Services;
 
 public sealed class AdminMaintenanceService
 {
-    private const string FirewallHelperTaskName = "Catan_Launcher Firewall Helper";
+    private const string FirewallHelperTaskName = "CatanLauncher Firewall Helper";
     private const string FirewallHelperArgument = "--firewall-helper";
 
     private static readonly string HelperDirectory = Path.Combine(

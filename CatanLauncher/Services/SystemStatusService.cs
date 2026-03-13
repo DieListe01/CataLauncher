@@ -10,9 +10,9 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.Win32;
-using Catan.WpfLauncher.Models;
+using CatanLauncher.Models;
 
-namespace Catan.WpfLauncher.Services;
+namespace CatanLauncher.Services;
 
 public sealed class SystemStatusService
 {

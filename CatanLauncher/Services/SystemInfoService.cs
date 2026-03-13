@@ -2,9 +2,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Microsoft.Win32;
-using Catan.WpfLauncher.Models;
+using CatanLauncher.Models;
 
-namespace Catan.WpfLauncher.Services;
+namespace CatanLauncher.Services;
 
 public sealed class SystemInfoService
 {
