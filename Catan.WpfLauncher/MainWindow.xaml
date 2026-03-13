@@ -1,0 +1,749 @@
+<Window x:Class="Catan.WpfLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Catan WPF Launcher"
+        Width="1280"
+        Height="748"
+        MinWidth="1200"
+        MinHeight="620"
+        Loaded="Window_Loaded"
+        WindowStartupLocation="Manual"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        Background="Transparent">
+    <Border Background="{StaticResource Brush.WindowGradient}" BorderBrush="#A97542" BorderThickness="1" CornerRadius="16" PreviewMouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+        <Grid>
+            <Image Source="Assets/catan-die-erste-insel-backround.jpg" Stretch="UniformToFill" Opacity="0.05" />
+            <Rectangle Fill="#44FFF6EA" RadiusX="16" RadiusY="16" />
+
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="124" />
+                    <RowDefinition Height="68" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Cursor="SizeAll" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="18" Height="18" CornerRadius="5" Background="#D84D2B" BorderBrush="#7A2C17" BorderThickness="1">
+                            <TextBlock Text="C" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="Catan Launcher" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#5A3F28" FontSize="13" FontFamily="Bahnschrift SemiBold" />
+                        <Border x:Name="AdminModeBadge" Margin="10,0,0,0" Padding="8,2" Background="#C6883A" CornerRadius="10" Visibility="Collapsed">
+                            <TextBlock Text="Admin-Modus" Foreground="#FFF8EA" FontSize="11" FontFamily="Bahnschrift SemiBold" />
+                        </Border>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Click="MinimizeButton_Click" Style="{StaticResource WindowChromeButtonStyle}" Margin="0,0,8,0" Content="_" />
+                    <Button Grid.Column="2" Click="MaximizeButton_Click" Style="{StaticResource WindowChromeButtonStyle}" Margin="0,0,8,0" Content="[]" />
+                    <Button Grid.Column="3" Click="CloseButton_Click" Style="{StaticResource WindowChromeButtonStyle}" Background="#E8C7B5" BorderBrush="#B57E65" Content="X" />
+                </Grid>
+
+                <Border Grid.Row="1" BorderBrush="#8A6038" BorderThickness="1" CornerRadius="24" Cursor="SizeAll" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Border.Background>
+                        <ImageBrush ImageSource="Assets/catan-die-erste-insel-backround.jpg" Stretch="UniformToFill" AlignmentY="Top" />
+                    </Border.Background>
+                    <Grid>
+                        <Rectangle RadiusX="24" RadiusY="24">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0" Color="#A6000000" />
+                                    <GradientStop Offset="0.42" Color="#54000000" />
+                                    <GradientStop Offset="1" Color="#10000000" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+
+                        <Grid Margin="20,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="260" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="CATAN LAUNCHER" Margin="0,4,0,0" Foreground="{StaticResource Brush.TextSoft}" FontSize="23" FontFamily="Book Antiqua" FontWeight="Bold" />
+                                <TextBlock Text="Multiplayer-Start mit dgVoodoo2, Firewall und Radmin VPN" Margin="0,7,0,0" Foreground="#F6E7CB" FontSize="13" />
+                                <TextBlock Text="Startet Catan mit den wichtigsten Multiplayer-Voraussetzungen in einem Durchlauf." Margin="0,4,0,0" Foreground="#DCC2A0" FontSize="11.5" />
+                            </StackPanel>
+
+                            <Border Grid.Column="1" Margin="0,0,10,0" Padding="12,10" Background="#26FFF6E6" CornerRadius="20" VerticalAlignment="Center" Tag="NoWindowDrag" Cursor="Arrow">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="22" ShadowDepth="8" Color="#33000000" Opacity="0.35" />
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="42" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button x:Name="MusicToggleButton" Click="MusicToggleButton_Click" Width="34" Height="34" BorderThickness="0" Background="#D9E1B8" Cursor="Hand" HorizontalAlignment="Left" VerticalAlignment="Top" Content=")))" Foreground="#315B33" FontFamily="Bahnschrift SemiBold" FontSize="10">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Grid>
+                                                    <Ellipse Fill="#6C4A25" Margin="0,6,0,0" Opacity="0.22" />
+                                                    <Ellipse Fill="{TemplateBinding Background}" Stroke="#7F633E" StrokeThickness="1" />
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
+                                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Musik" Foreground="{StaticResource Brush.TextSoft}" FontFamily="Bahnschrift SemiBold" FontSize="13" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="MusicPercentText" Grid.Column="1" Text="65 %" Foreground="#FFF2D4" FontFamily="Bahnschrift SemiBold" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                        </Grid>
+                                        <TextBlock Text="Hintergrundmusik" Margin="0,1,0,0" Foreground="#E4D4B8" FontSize="11" />
+                                        <Slider x:Name="MusicSlider" Style="{StaticResource AudioSliderStyle}" Minimum="0" Maximum="100" ValueChanged="MusicSlider_ValueChanged" Margin="0,9,0,0" Cursor="Hand" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.28*" />
+                        <ColumnDefinition Width="1.02*" />
+                        <ColumnDefinition Width="1.02*" />
+                        <ColumnDefinition Width="1.02*" />
+                        <ColumnDefinition Width="1.08*" />
+                        <ColumnDefinition Width="1.16*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Margin="0,0,12,0" Style="{StaticResource TopActionPrimaryButtonStyle}" Click="StartFullButton_Click">
+                        <StackPanel>
+                            <TextBlock Text="Catan starten" FontSize="15" FontFamily="Bahnschrift SemiBold" />
+                            <TextBlock Text="Komplettmodus mit Checks" Margin="0,3,0,0" FontSize="10.5" Foreground="#6A481E" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="1" Margin="0,0,12,0" Style="{StaticResource TopActionSecondaryButtonStyle}" Click="StartCatanOnlyButton_Click">
+                        <StackPanel>
+                            <TextBlock Text="Nur Spiel starten" FontSize="14" FontFamily="Bahnschrift SemiBold" Foreground="{StaticResource Brush.Text}" />
+                            <TextBlock Text="Direkt ohne Ablauf" Margin="0,3,0,0" FontSize="10.5" Foreground="#8C6E4B" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="2" Margin="0,0,12,0" Style="{StaticResource TopActionSecondaryButtonStyle}" Click="RefreshStatusButton_Click">
+                        <StackPanel>
+                            <TextBlock Text="Status pruefen" FontSize="14" FontFamily="Bahnschrift SemiBold" Foreground="{StaticResource Brush.Text}" />
+                            <TextBlock Text="Netzwerk und Versionen" Margin="0,3,0,0" FontSize="10.5" Foreground="#8C6E4B" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="3" Margin="0,0,12,0" Style="{StaticResource TopActionSecondaryButtonStyle}" Click="SettingsButton_Click">
+                        <StackPanel>
+                            <TextBlock Text="Einstellungen" FontSize="14" FontFamily="Bahnschrift SemiBold" Foreground="{StaticResource Brush.Text}" />
+                            <TextBlock Text="Pfade und Musik" Margin="0,3,0,0" FontSize="10.5" Foreground="#8C6E4B" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="4" Margin="0,0,12,0" Style="{StaticResource TopActionSecondaryButtonStyle}" Click="OpenRadminButton_Click">
+                        <StackPanel>
+                            <TextBlock Text="Radmin GUI" FontSize="14" FontFamily="Bahnschrift SemiBold" Foreground="{StaticResource Brush.Text}" />
+                            <TextBlock Text="VPN und Verbindung" Margin="0,3,0,0" FontSize="10.5" Foreground="#8C6E4B" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Column="5" Style="{StaticResource TopActionSecondaryButtonStyle}" Click="OpenDgVoodooButton_Click">
+                        <StackPanel>
+                            <TextBlock Text="dgVoodoo2 oeffnen" FontSize="14" FontFamily="Bahnschrift SemiBold" Foreground="{StaticResource Brush.Text}" />
+                            <TextBlock Text="Grafik-Setup und Version" Margin="0,3,0,0" FontSize="10.5" Foreground="#8C6E4B" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <ScrollViewer Grid.Row="3" Margin="0,10,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3.7*" />
+                        <ColumnDefinition Width="0.9*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid x:Name="LeftContentGrid" Grid.Column="0" Margin="0,0,14,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.1*" />
+                            <ColumnDefinition Width="1.85*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,10">
+                            <Button x:Name="LauncherTabButton" Style="{StaticResource TopNavActiveButtonStyle}" Content="Launcher" Click="LauncherTabButton_Click" />
+                            <Button x:Name="InstallationTabButton" Style="{StaticResource TopNavButtonStyle}" Margin="10,0,0,0" Opacity="0.9" Click="InstallationTabButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Installation" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" VerticalAlignment="Center" />
+                                    <Border x:Name="InstallationTabBadge" Grid.Column="1" Margin="8,0,0,0" Padding="6,1" CornerRadius="10" Background="{StaticResource Brush.BadgeWarning}" BorderBrush="#C8923D" BorderThickness="1" VerticalAlignment="Center" Visibility="Collapsed">
+                                        <TextBlock x:Name="InstallationTabBadgeText" Foreground="#7A531F" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                    </Border>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="SystemInformationTabButton" Style="{StaticResource TopNavButtonStyle}" Margin="10,0,0,0" Opacity="0.9" Click="SystemInformationTabButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Systeminformation" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" VerticalAlignment="Center" />
+                                    <Border x:Name="SystemInformationTabBadge" Grid.Column="1" Margin="8,0,0,0" Padding="6,1" CornerRadius="10" Background="{StaticResource Brush.BadgeWarning}" BorderBrush="#C8923D" BorderThickness="1" VerticalAlignment="Center" Visibility="Collapsed">
+                                        <TextBlock x:Name="SystemInformationTabBadgeText" Foreground="#7A531F" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                    </Border>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+
+                        <Border x:Name="NetworkCard" Grid.Row="1" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,14,14">
+                            <StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Netzwerk" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                    <TextBlock x:Name="NetworkProgressText" Margin="0,3,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" Visibility="Collapsed" />
+                                </StackPanel>
+
+                                <Grid Margin="0,16,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="74" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="96" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Grid.Row="0" Background="#D39A44" CornerRadius="10" Padding="10,7" Margin="0,0,12,12"><TextBlock Text="LAN" Foreground="#FFF7EC" FontFamily="Bahnschrift SemiBold" FontSize="12.5" /></Border>
+                                    <Border Grid.Row="0" Grid.Column="1" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,12,12">
+                                        <Grid>
+                                            <TextBlock x:Name="LanIpText" Text="-" Margin="0,0,90,0" Foreground="{StaticResource Brush.Text}" FontFamily="Consolas" FontSize="13" Cursor="Hand" ToolTip="Klick kopiert die LAN-IP." MouseLeftButtonUp="LanIpText_MouseLeftButtonUp" />
+                                            <Border x:Name="LanStatusBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                <TextBlock x:Name="LanStatusBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                            </Border>
+                                            <ContentControl x:Name="LanSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <Button x:Name="CopyLanIpButton" Grid.Row="0" Grid.Column="2" Margin="0,0,0,12" Style="{StaticResource MicroButtonStyle}" Content="Kopieren" Click="CopyLanIpButton_Click" IsEnabled="False" ToolTip="Kopiert die LAN-IP in die Zwischenablage." />
+
+                                    <Border Grid.Row="1" Background="#5D9856" CornerRadius="10" Padding="10,7" Margin="0,0,12,0"><TextBlock Text="VPN" Foreground="#FFF7EC" FontFamily="Bahnschrift SemiBold" FontSize="12.5" /></Border>
+                                    <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,12,0">
+                                        <Grid>
+                                            <TextBlock x:Name="VpnIpText" Text="-" Margin="0,0,90,0" Foreground="{StaticResource Brush.Text}" FontFamily="Consolas" FontSize="13" Cursor="Hand" ToolTip="Klick kopiert die VPN-IP." MouseLeftButtonUp="VpnIpText_MouseLeftButtonUp" />
+                                            <Border x:Name="VpnStatusBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                <TextBlock x:Name="VpnStatusBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                            </Border>
+                                            <ContentControl x:Name="VpnSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <Button x:Name="CopyVpnIpButton" Grid.Row="1" Grid.Column="2" Style="{StaticResource MicroButtonStyle}" Content="Kopieren" Click="CopyVpnIpButton_Click" IsEnabled="False" ToolTip="Kopiert die VPN-IP in die Zwischenablage." />
+                                </Grid>
+
+                                <Button Width="126" Margin="0,14,0,0" Style="{StaticResource MiniSecondaryButtonStyle}" Content="Aktualisieren" Click="RefreshStatusButton_Click" HorizontalAlignment="Left" />
+                                <TextBlock Text="LAN fuer lokale Runden, 26.x-Adresse fuer Radmin-VPN-Matches." Margin="0,14,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="12" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="ConfigStatusCard" Grid.Row="1" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Konfiguration / Status" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                    <TextBlock x:Name="ConfigProgressText" Margin="0,3,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" Visibility="Collapsed" />
+                                </StackPanel>
+
+                                <Grid Grid.Row="1" Margin="0,14,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="118" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="116" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Catan" Foreground="{StaticResource Brush.TextMuted}" Margin="0,4,0,10" FontSize="12.5" VerticalAlignment="Center" />
+                                    <Border Grid.Column="1" Grid.ColumnSpan="2" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,0,10">
+                                        <Grid>
+                                            <TextBlock x:Name="CatanPathText" Text="-" Margin="0,0,18,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                            <ContentControl x:Name="CatanPathSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="2" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="118" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="116" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="dgVoodoo2" Foreground="{StaticResource Brush.TextMuted}" Margin="0,4,0,10" FontSize="12.5" VerticalAlignment="Center" />
+                                    <Border Grid.Column="1" Grid.ColumnSpan="2" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,0,10">
+                                        <Grid>
+                                            <TextBlock x:Name="DgVoodooPathText" Text="-" Margin="0,0,18,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                            <ContentControl x:Name="DgVoodooPathSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="3" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="118" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="116" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="dgVoodoo2" Foreground="{StaticResource Brush.TextMuted}" Margin="0,4,0,10" FontSize="12.5" VerticalAlignment="Center" />
+                                    <Border x:Name="DgVoodooVersionBorder" Grid.Column="1" Grid.ColumnSpan="2" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,10,10">
+                                        <Grid>
+                                            <TextBlock x:Name="DgVoodooVersionStatusText" Text="installiert: - | online: -" Margin="0,0,82,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                            <Border x:Name="DgVoodooVersionBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                <TextBlock x:Name="DgVoodooVersionBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                            </Border>
+                                            <ContentControl x:Name="DgVoodooVersionSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <Button x:Name="DgVoodooPatchButton" Grid.Column="2" Style="{StaticResource MicroButtonStyle}" Content="Patch holen" Margin="0,0,0,10" Click="DgVoodooPatchButton_Click" Visibility="Collapsed" />
+                                </Grid>
+
+                                <Grid Grid.Row="4" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="118" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="116" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Radmin VPN" Foreground="{StaticResource Brush.TextMuted}" Margin="0,4,0,10" FontSize="12.5" VerticalAlignment="Center" />
+                                    <Border Grid.Column="1" Grid.ColumnSpan="2" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,0,10">
+                                        <Grid>
+                                            <TextBlock x:Name="RadminPathText" Text="-" Margin="0,0,18,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                            <ContentControl x:Name="RadminPathSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="118" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="116" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Radmin VPN" Foreground="{StaticResource Brush.TextMuted}" Margin="0,4,0,0" FontSize="12.5" VerticalAlignment="Center" />
+                                    <Border x:Name="RadminVersionBorder" Grid.Column="1" Grid.ColumnSpan="2" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,10,0">
+                                        <Grid>
+                                            <TextBlock x:Name="RadminVersionStatusText" Text="installiert: - | online: -" Margin="0,0,82,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                            <Border x:Name="RadminVersionBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                <TextBlock x:Name="RadminVersionBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                            </Border>
+                                            <ContentControl x:Name="RadminVersionSpinner" Style="{StaticResource FieldSpinnerStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <Button x:Name="RadminPatchButton" Grid.Column="2" Style="{StaticResource MicroButtonStyle}" Content="Patch holen" Click="RadminPatchButton_Click" Visibility="Collapsed" />
+                                </Grid>
+
+                                <Grid Grid.Row="6" Margin="0,10,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="118" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="116" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Windows Update" Foreground="{StaticResource Brush.TextMuted}" Margin="0,4,0,0" FontSize="12.5" VerticalAlignment="Center" />
+                                    <Border Grid.Column="1" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="10" Padding="10,7" Margin="0,0,10,0">
+                                        <Grid>
+                                            <TextBlock x:Name="WindowsUpdateStatusText" Text="wird geprueft..." Margin="0,0,82,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                            <Border x:Name="WindowsUpdateBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                <TextBlock x:Name="WindowsUpdateBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <Button x:Name="WindowsUpdateActionButton" Grid.Column="2" Style="{StaticResource MicroButtonStyle}" Content="Oeffnen" Click="OpenWindowsUpdateButton_Click" ToolTip="Oeffnet die Windows-Update-Einstellungen." />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border x:Name="InstallationCard" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Style="{StaticResource CardBorderStyle}" Margin="0" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock Text="Installation" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                <TextBlock Text="Hier findest du Spiel, Netzwerk-Tools und Grafik-Setup kompakt an einer Stelle." Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="12.5" />
+
+                                <Border Margin="0,18,0,0" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="18" Padding="18">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Width="42" Height="42" Background="#D84D2B" CornerRadius="21" HorizontalAlignment="Left">
+                                                <TextBlock Text="C" Foreground="#FFF8E9" FontFamily="Bahnschrift SemiBold" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <Border x:Name="InstallationCatanTopBadge" Grid.Column="2" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Margin="0" VerticalAlignment="Center" Visibility="Collapsed">
+                                                <TextBlock x:Name="InstallationCatanTopBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="11" />
+                                            </Border>
+                                        </Grid>
+
+                                        <TextBlock Grid.Row="1" Text="Catan.exe" Margin="0,14,0,0" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                        <TextBlock Grid.Row="2" Text="Basisspiel fuer den Launcher-Ablauf" Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="12.5" />
+
+                                        <Grid Grid.Row="3" Margin="0,16,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1.25*" />
+                                                <ColumnDefinition Width="14" />
+                                                <ColumnDefinition Width="0.92*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Pfad" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" />
+                                                <Border Background="#FFF7EE" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="12" Padding="12,9" Margin="0,6,0,0">
+                                                    <TextBlock x:Name="InstallationCatanPathText" Text="lade..." Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" FontFamily="Consolas" />
+                                                </Border>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="2">
+                                                <TextBlock Text="Startstatus" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" />
+                                                <Border Background="#FFF7EE" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="12" Padding="12,9" Margin="0,6,0,0">
+                                                    <Grid>
+                                                        <TextBlock x:Name="InstallationCatanStatusText" Text="lokale Installation wird geprueft..." Margin="0,0,80,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                                        <Border x:Name="InstallationCatanStatusBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                            <TextBlock x:Name="InstallationCatanStatusBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Grid Grid.Row="4" Margin="0,16,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Background="#F3E7D6" BorderBrush="#DEBF91" BorderThickness="1" CornerRadius="12" Padding="12,10" Margin="0,0,16,0">
+                                                <TextBlock x:Name="InstallationCatanHintText" Text="Lokale Installation wird geprueft..." Foreground="#7A5B3F" TextWrapping="Wrap" FontSize="12" />
+                                            </Border>
+
+                                            <WrapPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <Button x:Name="InstallationCatanStartButton" Width="140" Style="{StaticResource MicroButtonStyle}" Content="Spiel starten" Click="StartCatanOnlyButton_Click" />
+                                                <Button Width="132" Margin="10,0,0,0" Style="{StaticResource MicroButtonStyle}" Content="Pfad anpassen" Click="SettingsButton_Click" />
+                                            </WrapPanel>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
+                                <Grid Margin="0,18,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="18" Padding="18">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Width="42" Height="42" Background="#6AA25D" CornerRadius="21" HorizontalAlignment="Left">
+                                                    <TextBlock Text="R" Foreground="#FFF8E9" FontFamily="Bahnschrift SemiBold" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <Border x:Name="InstallationRadminTopBadge" Grid.Column="2" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Margin="0" VerticalAlignment="Center" Visibility="Collapsed">
+                                                    <TextBlock x:Name="InstallationRadminTopBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="11" />
+                                                </Border>
+                                            </Grid>
+
+                                            <TextBlock Grid.Row="1" Text="Radmin VPN" Margin="0,14,0,0" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                            <TextBlock Grid.Row="2" Text="Virtuelles LAN fuer Internet-Multiplayer" Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="12.5" />
+                                            <TextBlock Grid.Row="3" Text="Radmin VPN erstellt ein virtuelles LAN ueber das Internet. Damit koennen Spieler so verbunden werden, als waeren sie im selben lokalen Netzwerk." Margin="0,14,0,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+
+                                            <StackPanel Grid.Row="4" Margin="0,16,0,0">
+                                                <TextBlock Text="Pfad" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" />
+                                                <Border Background="#FFF7EE" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="12" Padding="12,9" Margin="0,6,0,0">
+                                                    <TextBlock x:Name="InstallationRadminPathText" Text="lade..." Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" FontFamily="Consolas" />
+                                                </Border>
+
+                                                <TextBlock Text="Versionsstatus" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" Margin="0,12,0,0" />
+                                                <Border Background="#FFF7EE" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="12" Padding="12,9" Margin="0,6,0,0">
+                                                    <Grid>
+                                                        <TextBlock x:Name="InstallationRadminVersionText" Text="installiert: pruefe... | online: pruefe..." Margin="0,0,80,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                                        <Border x:Name="InstallationRadminVersionBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                            <TextBlock x:Name="InstallationRadminVersionBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <Border Grid.Row="5" Background="#F3E7D6" BorderBrush="#DEBF91" BorderThickness="1" CornerRadius="12" Padding="12,10" Margin="0,16,0,0">
+                                                <TextBlock x:Name="InstallationRadminHintText" Text="Lokale Installation wird geprueft..." Foreground="#7A5B3F" TextWrapping="Wrap" FontSize="12" />
+                                            </Border>
+
+                                            <WrapPanel Grid.Row="6" Margin="0,16,0,0">
+                                                <Button Width="126" Style="{StaticResource MicroButtonStyle}" Content="Website" Click="OpenRadminWebsiteButton_Click" />
+                                                <Button x:Name="InstallationRadminOpenButton" Width="132" Margin="10,0,0,0" Style="{StaticResource MicroButtonStyle}" Content="Tool oeffnen" Click="OpenRadminButton_Click" />
+                                                <Button x:Name="InstallationRadminUpdateButton" Width="132" Margin="10,0,0,0" Style="{StaticResource MiniPrimaryButtonStyle}" Content="Update holen" Click="RadminPatchButton_Click" Visibility="Collapsed" />
+                                            </WrapPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="2" Background="{StaticResource Brush.Inset}" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="18" Padding="18">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Width="42" Height="42" Background="#C88E3C" CornerRadius="21" HorizontalAlignment="Left">
+                                                    <TextBlock Text="D" Foreground="#FFF8E9" FontFamily="Bahnschrift SemiBold" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <Border x:Name="InstallationDgVoodooTopBadge" Grid.Column="2" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Margin="0" VerticalAlignment="Center" Visibility="Collapsed">
+                                                    <TextBlock x:Name="InstallationDgVoodooTopBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="11" />
+                                                </Border>
+                                            </Grid>
+
+                                            <TextBlock Grid.Row="1" Text="dgVoodoo2" Margin="0,14,0,0" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                            <TextBlock Grid.Row="2" Text="Kompatibilitaet fuer aeltere Grafik-APIs" Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="12.5" />
+                                            <TextBlock Grid.Row="3" Text="dgVoodoo2 hilft dabei, aeltere DirectX- und Glide-Spiele auf modernen Windows-Systemen stabiler und kompatibler auszufuehren." Margin="0,14,0,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+
+                                            <StackPanel Grid.Row="4" Margin="0,16,0,0">
+                                                <TextBlock Text="Pfad" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" />
+                                                <Border Background="#FFF7EE" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="12" Padding="12,9" Margin="0,6,0,0">
+                                                    <TextBlock x:Name="InstallationDgVoodooPathText" Text="lade..." Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" FontFamily="Consolas" />
+                                                </Border>
+
+                                                <TextBlock Text="Versionsstatus" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" Margin="0,12,0,0" />
+                                                <Border Background="#FFF7EE" BorderBrush="{StaticResource Brush.InsetBorder}" BorderThickness="1" CornerRadius="12" Padding="12,9" Margin="0,6,0,0">
+                                                    <Grid>
+                                                        <TextBlock x:Name="InstallationDgVoodooVersionText" Text="installiert: pruefe... | online: pruefe..." Margin="0,0,80,0" Foreground="{StaticResource Brush.Text}" FontSize="12.5" TextWrapping="Wrap" />
+                                                        <Border x:Name="InstallationDgVoodooVersionBadge" Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1" Padding="8,3" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed">
+                                                            <TextBlock x:Name="InstallationDgVoodooVersionBadgeText" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="10.5" />
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <Border Grid.Row="5" Background="#F3E7D6" BorderBrush="#DEBF91" BorderThickness="1" CornerRadius="12" Padding="12,10" Margin="0,16,0,0">
+                                                <TextBlock x:Name="InstallationDgVoodooHintText" Text="Lokale Installation wird geprueft..." Foreground="#7A5B3F" TextWrapping="Wrap" FontSize="12" />
+                                            </Border>
+
+                                            <WrapPanel Grid.Row="6" Margin="0,16,0,0">
+                                                <Button Width="126" Style="{StaticResource MicroButtonStyle}" Content="Website" Click="OpenDgVoodooWebsiteButton_Click" />
+                                                <Button x:Name="InstallationDgVoodooOpenButton" Width="132" Margin="10,0,0,0" Style="{StaticResource MicroButtonStyle}" Content="Tool oeffnen" Click="OpenDgVoodooButton_Click" />
+                                                <Button x:Name="InstallationDgVoodooUpdateButton" Width="132" Margin="10,0,0,0" Style="{StaticResource MiniPrimaryButtonStyle}" Content="Update holen" Click="DgVoodooPatchButton_Click" Visibility="Collapsed" />
+                                            </WrapPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="SystemInfoCard" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Style="{StaticResource CardBorderStyle}" Margin="0" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock Text="Systeminformation" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                <TextBlock Text="Wichtige Systemdaten fuer Diagnose und Kompatibilitaet." Margin="0,6,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="12.5" />
+
+                                <ItemsControl x:Name="SystemInfoItemsControl" Margin="0,18,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Width="250" CornerRadius="14" Padding="14" Margin="0,0,14,14">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="{StaticResource Brush.Inset}" />
+                                                        <Setter Property="BorderBrush" Value="{StaticResource Brush.InsetBorder}" />
+                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BadgeKind}" Value="warning">
+                                                                <Setter Property="Background" Value="#E8D8CB" />
+                                                                <Setter Property="BorderBrush" Value="#C6774F" />
+                                                                <Setter Property="BorderThickness" Value="2" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Text="{Binding Label}" Foreground="{StaticResource Brush.TextMuted}" FontSize="12" VerticalAlignment="Center" />
+                                                        <Border Grid.Column="1" Visibility="{Binding BadgeVisibility}" BorderThickness="1" Padding="8,3" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                            <Border.Style>
+                                                                <Style TargetType="Border" BasedOn="{StaticResource StatusBadgeStyle}">
+                                                                    <Setter Property="Background" Value="{StaticResource Brush.BadgeNeutral}" />
+                                                                    <Setter Property="BorderBrush" Value="#C7AC84" />
+                                                                    <Setter Property="Visibility" Value="{Binding BadgeVisibility}" />
+                                                                    <Setter Property="Padding" Value="8,3" />
+                                                                    <Setter Property="Margin" Value="8,0,0,0" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding BadgeKind}" Value="ok">
+                                                                            <Setter Property="Background" Value="{StaticResource Brush.BadgeOk}" />
+                                                                            <Setter Property="BorderBrush" Value="#7D9A62" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding BadgeKind}" Value="warning">
+                                                                            <Setter Property="Background" Value="{StaticResource Brush.BadgeWarning}" />
+                                                                            <Setter Property="BorderBrush" Value="#C8923D" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+                                                            <TextBlock Text="{Binding BadgeText}" FontFamily="Bahnschrift SemiBold" FontSize="10.5">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="#6A4D2C" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding BadgeKind}" Value="ok">
+                                                                                <Setter Property="Foreground" Value="#486231" />
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding BadgeKind}" Value="warning">
+                                                                                <Setter Property="Foreground" Value="#7A531F" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Border>
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding Value}" Margin="0,8,0,0" Foreground="{StaticResource Brush.Text}" FontFamily="Bahnschrift SemiBold" FontSize="14" TextWrapping="Wrap" />
+                                                    <Button Margin="0,12,0,0" HorizontalAlignment="Left" Style="{StaticResource MicroButtonStyle}" Content="{Binding ActionText}" ToolTip="{Binding ActionToolTip}" Visibility="{Binding ActionVisibility}" Click="SystemInfoItemActionButton_Click" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="ActionsCard" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource CardBorderStyle}" Margin="0">
+                            <StackPanel>
+                                    <TextBlock Text="Aktionen" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="12" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <Button x:Name="FirewallActionButton" Grid.Row="0" Grid.Column="0" Style="{StaticResource MiniPrimaryButtonStyle}" Content="Ports freigeben" Click="FirewallToggleAction_Click" />
+                                        <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource MiniSecondaryButtonStyle}" Content="Status pruefen" Click="RefreshStatusButton_Click" />
+
+                                        <Button x:Name="RadminStateButton" Grid.Row="2" Grid.Column="0" Style="{StaticResource MiniSecondaryButtonStyle}" Content="Radmin oeffnen" Click="OpenRadminButton_Click" />
+                                        <Button x:Name="DgVoodooStateButton" Grid.Row="2" Grid.Column="2" Style="{StaticResource MiniSecondaryButtonStyle}" Content="dgVoodoo2 oeffnen" Click="OpenDgVoodooButton_Click" />
+                                    </Grid>
+
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Border Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeWarning}" BorderBrush="#D2AC63" BorderThickness="1"><TextBlock x:Name="FirewallBadgeText" Text="Firewall -" Foreground="#865D1C" /></Border>
+                                    </WrapPanel>
+                                    <TextBlock Text="Ports: TCP 47624 | UDP 2300-2400" Margin="2,8,0,0" Foreground="{StaticResource Brush.TextMuted}" FontSize="11.5" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border x:Name="LogCard" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <DockPanel>
+                                <TextBlock Text="Status / Log" FontFamily="Bahnschrift SemiBold" FontSize="20" Foreground="{StaticResource Brush.Text}" />
+                                <Border DockPanel.Dock="Right" Width="34" Height="34" Background="{StaticResource Brush.SecondaryGradient}" BorderBrush="#B48650" BorderThickness="1" CornerRadius="17">
+                                    <TextBlock Text="&lt;" Foreground="#5D462E" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Bahnschrift SemiBold" />
+                                </Border>
+                            </DockPanel>
+
+                            <Border Grid.Row="1" Margin="0,14,0,0" Background="{StaticResource Brush.Log}" BorderBrush="{StaticResource Brush.LogBorder}" BorderThickness="1" CornerRadius="16" Padding="14">
+                                <TextBox x:Name="LogTextBox"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Foreground="#F6E7D4"
+                                         FontFamily="Consolas"
+                                         FontSize="12.5"
+                                         TextWrapping="Wrap"
+                                         IsReadOnly="True"
+                                         AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Text="" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

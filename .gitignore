@@ -1,0 +1,14 @@
+bin/
+obj/
+.vs/
+
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+*.cache
+*.pdb
+
+TestResults/

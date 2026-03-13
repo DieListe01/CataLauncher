@@ -1,0 +1,443 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="Color.WindowBackground">#F1E5D0</Color>
+    <Color x:Key="Color.WindowBackgroundAlt">#DAB78E</Color>
+    <Color x:Key="Color.Header">#724523</Color>
+    <Color x:Key="Color.HeaderDark">#4D2E18</Color>
+    <Color x:Key="Color.Card">#FAF4E8</Color>
+    <Color x:Key="Color.CardAlt">#EAD8BC</Color>
+    <Color x:Key="Color.CardBorder">#C69B64</Color>
+    <Color x:Key="Color.Primary">#D89A3B</Color>
+    <Color x:Key="Color.PrimaryHover">#E7AF56</Color>
+    <Color x:Key="Color.Secondary">#E3CFAD</Color>
+    <Color x:Key="Color.SecondaryHover">#EEDDBF</Color>
+    <Color x:Key="Color.BadgeNeutral">#E9DFC9</Color>
+    <Color x:Key="Color.BadgeWarning">#F3DEAF</Color>
+    <Color x:Key="Color.BadgeOk">#DBE7C9</Color>
+    <Color x:Key="Color.Ok">#4E7F48</Color>
+    <Color x:Key="Color.Log">#1B140F</Color>
+    <Color x:Key="Color.LogBorder">#3C2D1F</Color>
+    <Color x:Key="Color.Text">#3C2917</Color>
+    <Color x:Key="Color.TextSoft">#F8EEDC</Color>
+    <Color x:Key="Color.TextMuted">#7F6751</Color>
+    <Color x:Key="Color.Inset">#F0E2CA</Color>
+    <Color x:Key="Color.InsetBorder">#D0AE7A</Color>
+
+    <SolidColorBrush x:Key="Brush.WindowBackground" Color="{StaticResource Color.WindowBackground}" />
+    <SolidColorBrush x:Key="Brush.WindowBackgroundAlt" Color="{StaticResource Color.WindowBackgroundAlt}" />
+    <SolidColorBrush x:Key="Brush.Header" Color="{StaticResource Color.Header}" />
+    <SolidColorBrush x:Key="Brush.HeaderDark" Color="{StaticResource Color.HeaderDark}" />
+    <SolidColorBrush x:Key="Brush.Card" Color="{StaticResource Color.Card}" />
+    <SolidColorBrush x:Key="Brush.CardAlt" Color="{StaticResource Color.CardAlt}" />
+    <SolidColorBrush x:Key="Brush.CardBorder" Color="{StaticResource Color.CardBorder}" />
+    <SolidColorBrush x:Key="Brush.Primary" Color="{StaticResource Color.Primary}" />
+    <SolidColorBrush x:Key="Brush.PrimaryHover" Color="{StaticResource Color.PrimaryHover}" />
+    <SolidColorBrush x:Key="Brush.Secondary" Color="{StaticResource Color.Secondary}" />
+    <SolidColorBrush x:Key="Brush.SecondaryHover" Color="{StaticResource Color.SecondaryHover}" />
+    <SolidColorBrush x:Key="Brush.BadgeNeutral" Color="{StaticResource Color.BadgeNeutral}" />
+    <SolidColorBrush x:Key="Brush.BadgeWarning" Color="{StaticResource Color.BadgeWarning}" />
+    <SolidColorBrush x:Key="Brush.BadgeOk" Color="{StaticResource Color.BadgeOk}" />
+    <SolidColorBrush x:Key="Brush.Ok" Color="{StaticResource Color.Ok}" />
+    <SolidColorBrush x:Key="Brush.Log" Color="{StaticResource Color.Log}" />
+    <SolidColorBrush x:Key="Brush.LogBorder" Color="{StaticResource Color.LogBorder}" />
+    <SolidColorBrush x:Key="Brush.Text" Color="{StaticResource Color.Text}" />
+    <SolidColorBrush x:Key="Brush.TextSoft" Color="{StaticResource Color.TextSoft}" />
+    <SolidColorBrush x:Key="Brush.TextMuted" Color="{StaticResource Color.TextMuted}" />
+    <SolidColorBrush x:Key="Brush.Inset" Color="{StaticResource Color.Inset}" />
+    <SolidColorBrush x:Key="Brush.InsetBorder" Color="{StaticResource Color.InsetBorder}" />
+
+    <LinearGradientBrush x:Key="Brush.WindowGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{StaticResource Color.WindowBackground}" Offset="0" />
+        <GradientStop Color="{StaticResource Color.WindowBackgroundAlt}" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.HeaderGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#926137" Offset="0" />
+        <GradientStop Color="#724523" Offset="0.58" />
+        <GradientStop Color="#472A17" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.CardGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFF9EF" Offset="0" />
+        <GradientStop Color="#F3E7D2" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.PrimaryGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F0BF67" Offset="0" />
+        <GradientStop Color="#D38D2F" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.PrimaryHoverGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F6CB79" Offset="0" />
+        <GradientStop Color="#DE9C42" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.SecondaryGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F1E1C4" Offset="0" />
+        <GradientStop Color="#D7B689" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.SecondaryHoverGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F7E9D2" Offset="0" />
+        <GradientStop Color="#E0C295" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.SuccessGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#71AE63" Offset="0" />
+        <GradientStop Color="#4F8447" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.SuccessHoverGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#82BD72" Offset="0" />
+        <GradientStop Color="#5D9254" Offset="1" />
+    </LinearGradientBrush>
+
+    <Style x:Key="CardBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Brush.CardGradient}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.CardBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="Padding" Value="18" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="14" ShadowDepth="5" Color="#6F4C24" Opacity="0.18" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Brush.PrimaryGradient}" />
+        <Setter Property="Foreground" Value="#1F170E" />
+        <Setter Property="BorderBrush" Value="#A06B24" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="15,10" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="Bahnschrift SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Shadow" Background="#8E5C25" CornerRadius="14" Margin="0,6,0,0" Opacity="0.8" />
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="14">
+                            <Grid>
+                                <Border Height="1" VerticalAlignment="Top" Margin="14,0,14,0" Background="#7AFFF4DB" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.PrimaryHoverGradient}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Margin" Value="0,4,0,0" />
+                            <Setter TargetName="Shadow" Property="Opacity" Value="0.25" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Brush.SecondaryGradient}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+        <Setter Property="BorderBrush" Value="#B48650" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="15,10" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="Bahnschrift SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Shadow" Background="#9C7650" CornerRadius="14" Margin="0,6,0,0" Opacity="0.65" />
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="14">
+                            <Grid>
+                                <Border Height="1" VerticalAlignment="Top" Margin="14,0,14,0" Background="#80FFF7EA" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.SecondaryHoverGradient}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Margin" Value="0,4,0,0" />
+                            <Setter TargetName="Shadow" Property="Opacity" Value="0.22" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TopActionPrimaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Brush.PrimaryGradient}" />
+        <Setter Property="Foreground" Value="#1F170E" />
+        <Setter Property="BorderBrush" Value="#A06B24" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Shadow" Background="#8B5A24" CornerRadius="20" Margin="0,9,0,0" Opacity="0.85" />
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="20">
+                            <Grid>
+                                <Border Height="1" VerticalAlignment="Top" Margin="20,0,20,0" Background="#85FFF5DE" />
+                                <ContentPresenter Margin="18,12" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.PrimaryHoverGradient}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Margin" Value="0,5,0,0" />
+                            <Setter TargetName="Shadow" Property="Opacity" Value="0.24" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TopActionSecondaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Brush.SecondaryGradient}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+        <Setter Property="BorderBrush" Value="#B48650" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Shadow" Background="#9C7650" CornerRadius="20" Margin="0,9,0,0" Opacity="0.72" />
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="20">
+                            <Grid>
+                                <Border Height="1" VerticalAlignment="Top" Margin="20,0,20,0" Background="#85FFF7EA" />
+                                <ContentPresenter Margin="18,12" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.SecondaryHoverGradient}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Margin" Value="0,5,0,0" />
+                            <Setter TargetName="Shadow" Property="Opacity" Value="0.22" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MiniPrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="FontSize" Value="12.5" />
+    </Style>
+
+    <Style x:Key="MiniSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="FontSize" Value="12.5" />
+    </Style>
+
+    <Style x:Key="MiniSuccessButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource Brush.SuccessGradient}" />
+        <Setter Property="Foreground" Value="#F7FFF6" />
+        <Setter Property="BorderBrush" Value="#4C7E46" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontFamily" Value="Bahnschrift SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Shadow" Background="#3D6738" CornerRadius="14" Margin="0,6,0,0" Opacity="0.72" />
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="14">
+                            <Grid>
+                                <Border Height="1" VerticalAlignment="Top" Margin="14,0,14,0" Background="#70FFFFFF" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.SuccessHoverGradient}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Margin" Value="0,4,0,0" />
+                            <Setter TargetName="Shadow" Property="Opacity" Value="0.22" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MicroButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="MinWidth" Value="88" />
+    </Style>
+
+    <Style x:Key="TopNavButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="Padding" Value="14,7" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="MinWidth" Value="116" />
+    </Style>
+
+    <Style x:Key="TopNavActiveButtonStyle" TargetType="Button" BasedOn="{StaticResource TopNavButtonStyle}">
+        <Setter Property="Background" Value="{StaticResource Brush.PrimaryGradient}" />
+        <Setter Property="Foreground" Value="#1F170E" />
+        <Setter Property="BorderBrush" Value="#A06B24" />
+    </Style>
+
+    <Style x:Key="WindowChromeButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontFamily" Value="Bahnschrift SemiBold" />
+        <Setter Property="Background" Value="#ECD9BA" />
+        <Setter Property="Foreground" Value="#3A2817" />
+        <Setter Property="BorderBrush" Value="#B58B55" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Shadow" Background="#8E6841" CornerRadius="12" Margin="0,4,0,0" Opacity="0.55" />
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#F6E8D1" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Margin" Value="0,3,0,0" />
+                            <Setter TargetName="Shadow" Property="Opacity" Value="0.18" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="StatusBadgeStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="11" />
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="Margin" Value="0,0,6,6" />
+    </Style>
+
+    <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="#FFF8F0" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.CardBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="0" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="AudioSliderStyle" TargetType="Slider">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid Margin="0,6,0,0">
+                        <Border Height="4" VerticalAlignment="Center" Background="#B38859" CornerRadius="2" Opacity="0.35" />
+                        <Track x:Name="PART_Track" VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton IsTabStop="False" Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4" VerticalAlignment="Center" Background="#E5B15D" CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="16" Height="16">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Grid>
+                                                <Ellipse Fill="#36000000" Margin="0,2,0,0" />
+                                                <Ellipse Fill="#FFF6E7" Stroke="#B67D35" StrokeThickness="1.5" />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton IsTabStop="False" Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4" VerticalAlignment="Center" Background="Transparent" CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="FieldSpinnerStyle" TargetType="ContentControl">
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContentControl">
+                    <Grid Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform>
+                            <RotateTransform Angle="0" />
+                        </Grid.RenderTransform>
+                        <Ellipse Stroke="#48B67D35" StrokeThickness="2" />
+                        <Path Data="M 7,1 A 6,6 0 0 1 13,7"
+                              Stroke="#B67D35"
+                              StrokeThickness="2"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever">
+                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                     From="0"
+                                                     To="360"
+                                                     Duration="0:0:0.9" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
