@@ -61,11 +61,12 @@ public sealed class GitHubReleaseUpdateService
                 string? downloadUrl = TryGetAssetDownloadUrl(root, config.GitHubAssetName);
                 if (!string.IsNullOrWhiteSpace(downloadUrl))
                 {
-                    var progress = new Progress<DownloadProgressInfo>(info =>
+                    IProgress<DownloadProgressInfo> progress = new Progress<DownloadProgressInfo>(info =>
                     {
                         UpdateProgressUi(progressBar, progressText, info);
                     });
 
+                    progress.Report(DownloadProgressInfo.Status("Pruefe Release-Asset..."));
                     await DownloadAndStartInstallerAsync(http, downloadUrl, progress);
                     Application.Current.Shutdown();
                     return;
@@ -160,9 +161,11 @@ public sealed class GitHubReleaseUpdateService
 
         string targetPath = Path.Combine(Path.GetTempPath(), fileName);
 
+        progress?.Report(DownloadProgressInfo.Status("Verbinde mit Download-Server..."));
         using HttpResponseMessage response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();
         long? totalBytes = response.Content.Headers.ContentLength;
+        progress?.Report(DownloadProgressInfo.Status("Download gestartet..."));
 
         await using (Stream source = await response.Content.ReadAsStreamAsync())
         await using (var target = File.Create(targetPath))
@@ -170,7 +173,7 @@ public sealed class GitHubReleaseUpdateService
             byte[] buffer = new byte[1024 * 32];
             long bytesReceived = 0;
 
-            progress?.Report(new DownloadProgressInfo(bytesReceived, totalBytes));
+            progress?.Report(DownloadProgressInfo.Bytes(bytesReceived, totalBytes));
 
             while (true)
             {
@@ -180,10 +183,11 @@ public sealed class GitHubReleaseUpdateService
 
                 await target.WriteAsync(buffer.AsMemory(0, read));
                 bytesReceived += read;
-                progress?.Report(new DownloadProgressInfo(bytesReceived, totalBytes));
+                progress?.Report(DownloadProgressInfo.Bytes(bytesReceived, totalBytes));
             }
         }
 
+        progress?.Report(DownloadProgressInfo.Status("Download abgeschlossen. Starte Installer..."));
         Process.Start(new ProcessStartInfo
         {
             FileName = targetPath,
@@ -242,12 +246,19 @@ public sealed class GitHubReleaseUpdateService
         if (progressBar == null || progressText == null)
             return;
 
+        if (!progress.HasByteProgress)
+        {
+            progressBar.IsIndeterminate = true;
+            progressText.Text = progress.StatusText;
+            return;
+        }
+
         if (progress.TotalBytes.HasValue && progress.TotalBytes.Value > 0)
         {
             double percent = (double)progress.BytesReceived / progress.TotalBytes.Value * 100.0;
             progressBar.IsIndeterminate = false;
             progressBar.Value = Math.Clamp(percent, 0, 100);
-            progressText.Text = "Update wird heruntergeladen: " +
+            progressText.Text = progress.StatusText + ": " +
                                 progressBar.Value.ToString("0") + " % (" +
                                 FormatBytes(progress.BytesReceived) + " / " +
                                 FormatBytes(progress.TotalBytes.Value) + ")";
@@ -255,7 +266,7 @@ public sealed class GitHubReleaseUpdateService
         }
 
         progressBar.IsIndeterminate = true;
-        progressText.Text = "Update wird heruntergeladen: " + FormatBytes(progress.BytesReceived);
+        progressText.Text = progress.StatusText + ": " + FormatBytes(progress.BytesReceived);
     }
 
     private static string FormatBytes(long bytes)
@@ -273,5 +284,12 @@ public sealed class GitHubReleaseUpdateService
         return bytes + " B";
     }
 
-    private readonly record struct DownloadProgressInfo(long BytesReceived, long? TotalBytes);
+    private readonly record struct DownloadProgressInfo(string StatusText, long BytesReceived, long? TotalBytes, bool HasByteProgress)
+    {
+        public static DownloadProgressInfo Status(string statusText) =>
+            new(statusText, 0, null, false);
+
+        public static DownloadProgressInfo Bytes(long bytesReceived, long? totalBytes) =>
+            new("Update wird heruntergeladen", bytesReceived, totalBytes, true);
+    }
 }
