@@ -69,6 +69,34 @@ Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; S
 Filename: "{app}\CatanLauncher.exe"; Description: "CatanLauncher starten"; Flags: nowait postinstall skipifsilent
 
 [Code]
+var
+  DirHintLabel: TNewStaticText;
+
+procedure ConfigureInstallDirUi;
+var
+  PreferredBaseDir: string;
+begin
+  PreferredBaseDir := 'E:\Games';
+  if DirExists(PreferredBaseDir) then
+    WizardForm.DirEdit.Text := AddBackslash(PreferredBaseDir) + 'CatanLauncher';
+
+  DirHintLabel := TNewStaticText.Create(WizardForm.SelectDirPage);
+  DirHintLabel.Parent := WizardForm.SelectDirPage.Surface;
+  DirHintLabel.Top := WizardForm.DirEdit.Top + WizardForm.DirEdit.Height + ScaleY(10);
+  DirHintLabel.Left := WizardForm.DirEdit.Left;
+  DirHintLabel.Width := WizardForm.SelectDirPage.Surface.Width - WizardForm.DirEdit.Left;
+  DirHintLabel.Height := ScaleY(30);
+  DirHintLabel.Caption :=
+    'Tipp: Du kannst den Zielpfad direkt eintippen. ' +
+    'Wenn der Ordner noch nicht existiert, wird er automatisch erstellt.';
+  DirHintLabel.WordWrap := True;
+end;
+
+procedure InitializeWizard;
+begin
+  ConfigureInstallDirUi;
+end;
+
 procedure RunOptionalToolInstallers;
 var
   ScriptPath: string;
