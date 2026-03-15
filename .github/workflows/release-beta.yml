@@ -137,9 +137,26 @@ jobs:
           "@ | Set-Content -Path $notesPath -Encoding utf8
           "notes_path=$notesPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-      - name: Sign installer (optional)
-        if: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 != '' && secrets.WINDOWS_CERTIFICATE_PASSWORD != '' }}
+      - name: Resolve signing availability
+        id: signing
         shell: pwsh
+        env:
+          CERT_B64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+          CERT_PWD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          if (-not [string]::IsNullOrWhiteSpace($env:CERT_B64) -and -not [string]::IsNullOrWhiteSpace($env:CERT_PWD)) {
+            "enabled=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+            "enabled=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+
+      - name: Sign installer (optional)
+        if: ${{ steps.signing.outputs.enabled == 'true' }}
+        shell: pwsh
+        env:
+          CERT_B64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+          CERT_PWD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          TS_URL: ${{ secrets.WINDOWS_TIMESTAMP_URL }}
         run: |
           $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
             Sort-Object FullName -Descending |
@@ -150,9 +167,9 @@ jobs:
           }
 
           $certPath = Join-Path $env:RUNNER_TEMP "codesign.pfx"
-          [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String("${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}"))
+          [System.IO.File]::WriteAllBytes($certPath, [System.Convert]::FromBase64String($env:CERT_B64))
 
-          $tsUrl = "${{ secrets.WINDOWS_TIMESTAMP_URL }}"
+          $tsUrl = $env:TS_URL
           if ([string]::IsNullOrWhiteSpace($tsUrl)) {
             $tsUrl = "http://timestamp.digicert.com"
           }
@@ -160,7 +177,7 @@ jobs:
           & $signtool sign `
             /fd SHA256 `
             /f $certPath `
-            /p "${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}" `
+            /p "$env:CERT_PWD" `
             /tr $tsUrl `
             /td SHA256 `
             "${{ steps.installer.outputs.installer_path }}"
@@ -170,7 +187,7 @@ jobs:
           }
 
       - name: Verify signature (optional)
-        if: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 != '' && secrets.WINDOWS_CERTIFICATE_PASSWORD != '' }}
+        if: ${{ steps.signing.outputs.enabled == 'true' }}
         shell: pwsh
         run: |
           $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
@@ -183,7 +200,7 @@ jobs:
           }
 
       - name: No signing certificate configured
-        if: ${{ !(secrets.WINDOWS_CERTIFICATE_BASE64 != '' && secrets.WINDOWS_CERTIFICATE_PASSWORD != '') }}
+        if: ${{ steps.signing.outputs.enabled != 'true' }}
         shell: pwsh
         run: Write-Host "Skipping code signing: WINDOWS_CERTIFICATE_BASE64 / WINDOWS_CERTIFICATE_PASSWORD not set."
 
