@@ -43,6 +43,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        LauncherVersionText.Text = "v" + AppVersionService.GetCurrentVersionText();
         SetActiveTab(MainTabView.Launcher);
         AdminModeBadge.Visibility = adminMaintenanceService.IsAdministrator() ? Visibility.Visible : Visibility.Collapsed;
         Closed += (_, _) => StopLauncherMusic(true);

@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
-using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using CatanLauncher.Models;
@@ -37,7 +36,7 @@ public sealed class GitHubReleaseUpdateService
                 ? tagElement.GetString() ?? string.Empty
                 : string.Empty;
 
-            Version currentVersion = GetCurrentVersion();
+            Version currentVersion = AppVersionService.GetCurrentVersion();
             if (!TryParseVersion(latestTag, out Version? latestVersion) || latestVersion <= currentVersion)
                 return;
 
@@ -69,21 +68,6 @@ public sealed class GitHubReleaseUpdateService
         {
             // Update-Check darf den Launcher-Start niemals blockieren.
         }
-    }
-
-    private static Version GetCurrentVersion()
-    {
-        Assembly assembly = Assembly.GetExecutingAssembly();
-
-        string? informationalVersion = assembly
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion;
-
-        if (TryParseVersion(informationalVersion ?? string.Empty, out Version? parsedInformationalVersion))
-            return parsedInformationalVersion ?? new Version(0, 0, 0, 0);
-
-        Version? assemblyVersion = assembly.GetName().Version;
-        return assemblyVersion ?? new Version(0, 0, 0, 0);
     }
 
     private static bool TryParseVersion(string value, out Version? version)

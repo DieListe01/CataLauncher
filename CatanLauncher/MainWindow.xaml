@@ -40,6 +40,7 @@
                             <TextBlock Text="C" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" />
                         </Border>
                         <TextBlock Text="Catan Launcher" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#5A3F28" FontSize="13" FontFamily="Bahnschrift SemiBold" />
+                        <TextBlock x:Name="LauncherVersionText" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="#8C6E4B" FontSize="11.5" FontFamily="Consolas" />
                         <Border x:Name="AdminModeBadge" Margin="10,0,0,0" Padding="8,2" Background="#C6883A" CornerRadius="10" Visibility="Collapsed">
                             <TextBlock Text="Admin-Modus" Foreground="#FFF8EA" FontSize="11" FontFamily="Bahnschrift SemiBold" />
                         </Border>
