@@ -20,5 +20,16 @@ public partial class App : Application
         var window = new MainWindow();
         MainWindow = window;
         window.Show();
+
+        _ = CheckForLauncherUpdatesAsync(window);
+    }
+
+    private static async Task CheckForLauncherUpdatesAsync(Window owner)
+    {
+        var configService = new LauncherConfigService();
+        var updateService = new GitHubReleaseUpdateService();
+
+        var config = configService.Load();
+        await updateService.CheckForUpdateAsync(owner, config);
     }
 }

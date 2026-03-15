@@ -1,0 +1,81 @@
+{
+  "template": "# Changelog\n\n{{CHANGELOG}}\n\n{{UNCATEGORIZED}}",
+  "empty_template": "# Changelog\n\nKeine relevanten Aenderungen gefunden.",
+  "categories": [
+    {
+      "title": "## Features",
+      "labels": ["feat", "feature"]
+    },
+    {
+      "title": "## Fixes",
+      "labels": ["fix", "bug"]
+    },
+    {
+      "title": "## Refactoring",
+      "labels": ["refactor"]
+    },
+    {
+      "title": "## Performance",
+      "labels": ["perf"]
+    },
+    {
+      "title": "## Build And CI",
+      "labels": ["build", "ci"]
+    },
+    {
+      "title": "## Docs",
+      "labels": ["docs"]
+    },
+    {
+      "title": "## Tests",
+      "labels": ["test"]
+    },
+    {
+      "title": "## Chore",
+      "labels": ["chore"]
+    }
+  ],
+  "label_extractor": [
+    {
+      "pattern": "^(feat)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(fix)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(refactor)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(perf)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(docs)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(test)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(build)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(ci)(\\(.+\\))?:",
+      "target": "$1"
+    },
+    {
+      "pattern": "^(chore)(\\(.+\\))?:",
+      "target": "$1"
+    }
+  ],
+  "pr_template": "- ${{TITLE}} (#${{NUMBER}})",
+  "sort": {
+    "order": "ASC",
+    "on_property": "mergedAt"
+  }
+}

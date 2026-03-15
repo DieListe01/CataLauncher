@@ -1,0 +1,134 @@
+name: Build And Publish Beta Release
+
+on:
+  push:
+    tags:
+      - "v*-beta*"
+      - "v*-rc*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Pre-release version without leading v (e.g. 1.2.0-beta.1)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-beta-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ github.event.inputs.version }}"
+            if ([string]::IsNullOrWhiteSpace($version)) {
+              throw "workflow_dispatch input 'version' is required."
+            }
+            $tag = "v$version"
+          } else {
+            $tag = "${{ github.ref_name }}"
+            $version = $tag.TrimStart("v")
+          }
+
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            throw "Could not resolve version."
+          }
+
+          if ($version -notmatch "-") {
+            throw "Beta workflow expects a pre-release version like 1.2.0-beta.1."
+          }
+
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Restore
+        run: dotnet restore Catan.slnx
+
+      - name: Publish app
+        shell: pwsh
+        run: |
+          $publishDir = Join-Path $env:GITHUB_WORKSPACE "artifacts\publish"
+          New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
+
+          dotnet publish CatanLauncher/CatanLauncher.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:Version=${{ steps.version.outputs.version }} `
+            -o $publishDir
+
+          "publish_dir=$publishDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        id: publish
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup -y --no-progress
+
+      - name: Build installer
+        id: installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            throw "ISCC.exe not found after installation."
+          }
+
+          $outDir = Join-Path $env:GITHUB_WORKSPACE "artifacts\release"
+          New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+
+          & $iscc `
+            "/DMyAppVersion=${{ steps.version.outputs.version }}" `
+            "/DPublishDir=${{ steps.publish.outputs.publish_dir }}" `
+            "/DOutputDir=$outDir" `
+            "installer\CatanLauncher.iss"
+
+          $installerPath = Join-Path $outDir "CatanLauncher-Setup-v${{ steps.version.outputs.version }}.exe"
+          if (-not (Test-Path $installerPath)) {
+            throw "Expected installer not found: $installerPath"
+          }
+
+          "installer_path=$installerPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Build changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          configuration: .github/changelog-config.json
+          mode: COMMIT
+          toTag: ${{ steps.version.outputs.tag }}
+
+      - name: Write release notes
+        id: notes
+        shell: pwsh
+        run: |
+          $notesPath = Join-Path $env:GITHUB_WORKSPACE "artifacts\release-notes.md"
+          @"
+          ${{ steps.changelog.outputs.changelog }}
+          "@ | Set-Content -Path $notesPath -Encoding utf8
+          "notes_path=$notesPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Upload beta release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          prerelease: true
+          files: |
+            ${{ steps.installer.outputs.installer_path }}
+          body_path: ${{ steps.notes.outputs.notes_path }}

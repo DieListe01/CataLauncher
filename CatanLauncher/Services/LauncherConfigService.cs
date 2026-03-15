@@ -40,6 +40,9 @@ public sealed class LauncherConfigService
         config.DgVoodooExePath = NormalizeExePath(config.DgVoodooExePath, "dgVoodooCpl.exe");
         config.RadminExePath = NormalizeRadminPath(config.RadminExePath);
         config.MusicVolume = Math.Clamp(config.MusicVolume, 0, 100);
+        config.GitHubOwner = (config.GitHubOwner ?? string.Empty).Trim();
+        config.GitHubRepository = (config.GitHubRepository ?? string.Empty).Trim();
+        config.GitHubAssetName = (config.GitHubAssetName ?? string.Empty).Trim();
         return config;
     }
 
@@ -70,7 +73,11 @@ public sealed class LauncherConfigService
             string.Empty,
             "[Launcher]",
             "MusikAktiv = " + config.MusicEnabled.ToString().ToLowerInvariant(),
-            "MusikLautstaerke = " + Math.Clamp(config.MusicVolume, 0, 100)
+            "MusikLautstaerke = " + Math.Clamp(config.MusicVolume, 0, 100),
+            "UpdateChecksAktiv = " + config.UpdateChecksEnabled.ToString().ToLowerInvariant(),
+            "GitHubOwner = " + (config.GitHubOwner ?? string.Empty),
+            "GitHubRepo = " + (config.GitHubRepository ?? string.Empty),
+            "GitHubAssetName = " + (config.GitHubAssetName ?? string.Empty)
         };
 
         File.WriteAllLines(configPath, lines);
@@ -94,9 +101,29 @@ public sealed class LauncherConfigService
                 break;
             case "Launcher":
                 if (key.Equals("MusikAktiv", StringComparison.OrdinalIgnoreCase))
+                {
                     config.MusicEnabled = !value.Equals("false", StringComparison.OrdinalIgnoreCase) && value != "0";
+                }
                 else if (key.Equals("MusikLautstaerke", StringComparison.OrdinalIgnoreCase) && int.TryParse(value, out int volume))
+                {
                     config.MusicVolume = volume;
+                }
+                else if (key.Equals("UpdateChecksAktiv", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.UpdateChecksEnabled = !value.Equals("false", StringComparison.OrdinalIgnoreCase) && value != "0";
+                }
+                else if (key.Equals("GitHubOwner", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.GitHubOwner = value;
+                }
+                else if (key.Equals("GitHubRepo", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.GitHubRepository = value;
+                }
+                else if (key.Equals("GitHubAssetName", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.GitHubAssetName = value;
+                }
                 break;
         }
     }
