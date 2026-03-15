@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private readonly SystemInfoService systemInfoService = new();
     private readonly AdminMaintenanceService adminMaintenanceService = new();
     private readonly GitHubReleaseUpdateService updateService = new();
+    private readonly DgVoodooUpdateService dgVoodooUpdateService = new();
     private LauncherConfig currentConfig = new();
     private SystemStatusSnapshot? currentStatus;
     private bool isLoading;
@@ -679,10 +680,41 @@ public partial class MainWindow : Window
         }
     }
 
-    private void DgVoodooPatchButton_Click(object sender, RoutedEventArgs e)
+    private async void DgVoodooPatchButton_Click(object sender, RoutedEventArgs e)
     {
-        WriteLog("Oeffne dgVoodoo2 Download-Seite...");
-        OpenUrl("https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/#");
+        try
+        {
+            if (string.IsNullOrWhiteSpace(currentConfig.DgVoodooExePath) || !File.Exists(currentConfig.DgVoodooExePath))
+            {
+                ShowError("dgVoodoo2-Update nicht moeglich", "Die konfigurierte dgVoodooCpl.exe wurde nicht gefunden. Bitte Pfad in den Einstellungen pruefen.");
+                return;
+            }
+
+            string targetDirectory = Path.GetDirectoryName(currentConfig.DgVoodooExePath) ?? string.Empty;
+            MessageBoxResult confirm = MessageBox.Show(
+                this,
+                "Die neueste dgVoodoo2-Version wird heruntergeladen und nach\n" + targetDirectory + "\nkopiert (Dateien werden ueberschrieben).\n\nFortfahren?",
+                "dgVoodoo2 aktualisieren",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            InstallationDgVoodooUpdateButton.IsEnabled = false;
+            WriteLog("Lade neueste dgVoodoo2-Version herunter...");
+            string installedVersion = await dgVoodooUpdateService.InstallLatestAsync(currentConfig.DgVoodooExePath);
+            WriteLog("dgVoodoo2 erfolgreich aktualisiert auf Version " + installedVersion + ".");
+            await RefreshUiStateAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowError("dgVoodoo2-Update fehlgeschlagen", ex.Message);
+        }
+        finally
+        {
+            InstallationDgVoodooUpdateButton.IsEnabled = true;
+        }
     }
 
     private void RadminPatchButton_Click(object sender, RoutedEventArgs e)
