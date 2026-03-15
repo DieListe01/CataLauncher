@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private readonly SystemStatusService statusService = new();
     private readonly SystemInfoService systemInfoService = new();
     private readonly AdminMaintenanceService adminMaintenanceService = new();
+    private readonly GitHubReleaseUpdateService updateService = new();
     private LauncherConfig currentConfig = new();
     private SystemStatusSnapshot? currentStatus;
     private bool isLoading;
@@ -56,6 +57,20 @@ public partial class MainWindow : Window
     {
         ApplyStartupBounds();
         await RefreshUiStateAsync();
+    }
+
+    private async void CheckLauncherVersionButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var config = string.IsNullOrWhiteSpace(currentConfig.ConfigFilePath) ? configService.Load() : currentConfig;
+            await updateService.CheckForUpdateAsync(this, config);
+            WriteLog("Launcher-Version geprueft.");
+        }
+        catch (Exception ex)
+        {
+            ShowError("Version konnte nicht geprueft werden", ex.Message);
+        }
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -666,11 +681,13 @@ public partial class MainWindow : Window
 
     private void DgVoodooPatchButton_Click(object sender, RoutedEventArgs e)
     {
-        OpenUrl("https://github.com/dege-diosg/dgVoodoo2/releases/latest");
+        WriteLog("Oeffne dgVoodoo2 Download-Seite...");
+        OpenUrl("https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/#");
     }
 
     private void RadminPatchButton_Click(object sender, RoutedEventArgs e)
     {
+        WriteLog("Oeffne Radmin VPN Download-Seite...");
         OpenUrl("https://www.radmin-vpn.com/de/");
     }
 
