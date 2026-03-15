@@ -32,6 +32,10 @@ public sealed class SystemStatusService
             RadminInstalledVersion = GetInstalledVersion(config.RadminExePath, string.IsNullOrWhiteSpace(config.RadminExePath) ? "nicht installiert" : "unbekannt")
         };
 
+        bool hasReliableDgVoodooInstalledVersion = TryGetInstalledDgVoodooReleaseVersion(config.DgVoodooExePath, out string dgVoodooInstalledReleaseVersion);
+        if (hasReliableDgVoodooInstalledVersion)
+            snapshot.DgVoodooInstalledVersion = dgVoodooInstalledReleaseVersion;
+
         NvidiaInstalledAdapter? nvidiaAdapter = GetInstalledNvidiaAdapter();
         if (nvidiaAdapter != null)
         {
@@ -55,7 +59,15 @@ public sealed class SystemStatusService
         snapshot.WindowsUpdateLastCheckedText = windowsUpdateInfo.LastCheckedText;
 
         snapshot.DgVoodooLatestVersion = dgVoodooTask.Result;
-        snapshot.DgVoodooUpdateAvailable = IsUpdateAvailable(snapshot.DgVoodooInstalledVersion, snapshot.DgVoodooLatestVersion);
+        if (!hasReliableDgVoodooInstalledVersion)
+        {
+            snapshot.DgVoodooLatestVersion = "online nicht pruefbar";
+            snapshot.DgVoodooUpdateAvailable = false;
+        }
+        else
+        {
+            snapshot.DgVoodooUpdateAvailable = IsUpdateAvailable(snapshot.DgVoodooInstalledVersion, snapshot.DgVoodooLatestVersion);
+        }
 
         snapshot.RadminLatestVersion = radminTask.Result;
         snapshot.RadminUpdateAvailable = IsUpdateAvailable(snapshot.RadminInstalledVersion, snapshot.RadminLatestVersion);
@@ -310,6 +322,38 @@ public sealed class SystemStatusService
         }
 
         return "online nicht pruefbar";
+    }
+
+    private static bool TryGetInstalledDgVoodooReleaseVersion(string dgVoodooExePath, out string version)
+    {
+        version = string.Empty;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(dgVoodooExePath) || !File.Exists(dgVoodooExePath))
+                return false;
+
+            string directory = Path.GetDirectoryName(dgVoodooExePath) ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+                return false;
+
+            string markerPath = Path.Combine(directory, DgVoodooUpdateService.InstalledVersionMarkerFileName);
+            if (File.Exists(markerPath))
+            {
+                string markerValue = NormalizeVersionString(File.ReadAllText(markerPath));
+                if (TryParseVersion(markerValue, out _))
+                {
+                    version = markerValue;
+                    return true;
+                }
+            }
+        }
+        catch
+        {
+            // Fallback auf Dateiversion ohne verlaesslichen Vergleich.
+        }
+
+        return false;
     }
 
     private async Task<NvidiaDriverReleaseInfo?> GetLatestNvidiaDriverAsync(string installedGpuName)

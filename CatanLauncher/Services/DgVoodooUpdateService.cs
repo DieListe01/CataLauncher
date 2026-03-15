@@ -9,6 +9,7 @@ public sealed class DgVoodooUpdateService
 {
     private const string LatestReleaseApiUrl = "https://api.github.com/repos/dege-diosg/dgVoodoo2/releases/latest";
     private const string FallbackPageUrl = "https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/#";
+    public const string InstalledVersionMarkerFileName = ".catanlauncher-dgvoodoo-version.txt";
 
     public async Task<DgVoodooUpdateResult> InstallLatestAsync(string dgVoodooExePath, IProgress<string>? status = null)
     {
@@ -64,6 +65,9 @@ public sealed class DgVoodooUpdateService
             status?.Report("Kopiere neue Dateien...");
             string sourceDirectory = ResolveExtractedRoot(extractPath);
             CopyDirectoryRecursive(sourceDirectory, targetDirectory);
+
+            status?.Report("Speichere lokale Versionsmarkierung...");
+            WriteInstalledVersionMarker(targetDirectory, releaseVersion);
         }
         finally
         {
@@ -94,6 +98,23 @@ public sealed class DgVoodooUpdateService
             throw new DirectoryNotFoundException("Backup-Ordner wurde nicht gefunden.");
 
         CopyDirectoryRecursive(backupPath, targetDirectory);
+    }
+
+    private static void WriteInstalledVersionMarker(string targetDirectory, string version)
+    {
+        try
+        {
+            string normalized = version.TrimStart('v', 'V').Trim();
+            if (string.IsNullOrWhiteSpace(normalized))
+                return;
+
+            string markerPath = Path.Combine(targetDirectory, InstalledVersionMarkerFileName);
+            File.WriteAllText(markerPath, normalized);
+        }
+        catch
+        {
+            // Marker ist optional und darf den Update-Prozess nicht brechen.
+        }
     }
 
     private static string? FindZipAssetUrl(JsonElement releaseRoot)
