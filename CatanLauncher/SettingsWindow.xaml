@@ -227,6 +227,21 @@
                                 </StackPanel>
                             </Border>
 
+                            <Border Style="{StaticResource SettingsInfoBorderStyle}" Margin="0,12,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Updates" Foreground="{StaticResource Brush.Text}" FontFamily="Bahnschrift SemiBold" />
+                                    <CheckBox x:Name="AutoCheckAtStartupCheckBox" Style="{StaticResource SettingsCheckBoxStyle}" Margin="0,10,0,0" Content="Beim Start automatisch nach Launcher-Updates suchen" />
+                                    <CheckBox x:Name="LocalTelemetryCheckBox" Style="{StaticResource SettingsCheckBoxStyle}" Margin="0,8,0,0" Content="Lokales Fehler-/Update-Logging aktivieren" />
+                                    <DockPanel Margin="0,10,0,0">
+                                        <TextBlock DockPanel.Dock="Left" Text="Update-Kanal:" Foreground="{StaticResource Brush.TextMuted}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        <ComboBox x:Name="UpdateChannelComboBox" Width="130" SelectedIndex="0">
+                                            <ComboBoxItem Content="stable" />
+                                            <ComboBoxItem Content="beta" />
+                                        </ComboBox>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Border>
+
                             <WrapPanel Margin="0,16,0,0">
                                 <Border Style="{StaticResource StatusBadgeStyle}" Background="{StaticResource Brush.BadgeNeutral}" BorderBrush="#C7AC84" BorderThickness="1">
                                     <TextBlock Text="Catan + dgVoodoo2 erforderlich" Foreground="#6A4D2C" FontFamily="Bahnschrift SemiBold" FontSize="11" />

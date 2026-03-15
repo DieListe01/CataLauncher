@@ -43,6 +43,8 @@ public sealed class LauncherConfigService
         config.GitHubOwner = (config.GitHubOwner ?? string.Empty).Trim();
         config.GitHubRepository = (config.GitHubRepository ?? string.Empty).Trim();
         config.GitHubAssetName = (config.GitHubAssetName ?? string.Empty).Trim();
+        config.UpdateChannel = NormalizeUpdateChannel(config.UpdateChannel);
+        config.LastDgVoodooBackupPath = (config.LastDgVoodooBackupPath ?? string.Empty).Trim();
         return config;
     }
 
@@ -75,9 +77,13 @@ public sealed class LauncherConfigService
             "MusikAktiv = " + config.MusicEnabled.ToString().ToLowerInvariant(),
             "MusikLautstaerke = " + Math.Clamp(config.MusicVolume, 0, 100),
             "UpdateChecksAktiv = " + config.UpdateChecksEnabled.ToString().ToLowerInvariant(),
+            "AutoCheckBeimStart = " + config.AutoCheckAtStartup.ToString().ToLowerInvariant(),
+            "UpdateKanal = " + NormalizeUpdateChannel(config.UpdateChannel),
+            "LokalesLoggingAktiv = " + config.LocalTelemetryEnabled.ToString().ToLowerInvariant(),
             "GitHubOwner = " + (config.GitHubOwner ?? string.Empty),
             "GitHubRepo = " + (config.GitHubRepository ?? string.Empty),
-            "GitHubAssetName = " + (config.GitHubAssetName ?? string.Empty)
+            "GitHubAssetName = " + (config.GitHubAssetName ?? string.Empty),
+            "LastDgVoodooBackupPfad = " + (config.LastDgVoodooBackupPath ?? string.Empty)
         };
 
         File.WriteAllLines(configPath, lines);
@@ -112,6 +118,18 @@ public sealed class LauncherConfigService
                 {
                     config.UpdateChecksEnabled = !value.Equals("false", StringComparison.OrdinalIgnoreCase) && value != "0";
                 }
+                else if (key.Equals("AutoCheckBeimStart", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.AutoCheckAtStartup = !value.Equals("false", StringComparison.OrdinalIgnoreCase) && value != "0";
+                }
+                else if (key.Equals("UpdateKanal", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.UpdateChannel = value;
+                }
+                else if (key.Equals("LokalesLoggingAktiv", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.LocalTelemetryEnabled = !value.Equals("false", StringComparison.OrdinalIgnoreCase) && value != "0";
+                }
                 else if (key.Equals("GitHubOwner", StringComparison.OrdinalIgnoreCase))
                 {
                     config.GitHubOwner = value;
@@ -124,8 +142,18 @@ public sealed class LauncherConfigService
                 {
                     config.GitHubAssetName = value;
                 }
+                else if (key.Equals("LastDgVoodooBackupPfad", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.LastDgVoodooBackupPath = value;
+                }
                 break;
         }
+    }
+
+    private static string NormalizeUpdateChannel(string? value)
+    {
+        string channel = (value ?? string.Empty).Trim().ToLowerInvariant();
+        return channel == "beta" ? "beta" : "stable";
     }
 
     private static string PreferBetterPath(string existingValue, string candidate)

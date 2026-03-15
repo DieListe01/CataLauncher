@@ -606,6 +606,7 @@
                                                 <Button Width="126" Style="{StaticResource MicroButtonStyle}" Content="Website" Click="OpenDgVoodooWebsiteButton_Click" />
                                                 <Button x:Name="InstallationDgVoodooOpenButton" Width="132" Margin="10,0,0,0" Style="{StaticResource MicroButtonStyle}" Content="Tool oeffnen" Click="OpenDgVoodooButton_Click" />
                                                 <Button x:Name="InstallationDgVoodooUpdateButton" Width="132" Margin="10,0,0,0" Style="{StaticResource MiniPrimaryButtonStyle}" Content="Update holen" Click="DgVoodooPatchButton_Click" Visibility="Collapsed" />
+                                                <Button x:Name="InstallationDgVoodooRollbackButton" Width="126" Margin="10,0,0,0" Style="{StaticResource MicroButtonStyle}" Content="Rollback" Click="DgVoodooRollbackButton_Click" Visibility="Collapsed" />
                                             </WrapPanel>
                                         </Grid>
                                     </Border>

@@ -9,7 +9,11 @@ public sealed class LauncherConfig
     public bool MusicEnabled { get; set; } = true;
     public int MusicVolume { get; set; } = 65;
     public bool UpdateChecksEnabled { get; set; } = true;
+    public bool AutoCheckAtStartup { get; set; } = true;
+    public string UpdateChannel { get; set; } = "stable";
+    public bool LocalTelemetryEnabled { get; set; } = true;
     public string GitHubOwner { get; set; } = "DieListe01";
     public string GitHubRepository { get; set; } = "CataLauncher";
     public string GitHubAssetName { get; set; } = string.Empty;
+    public string LastDgVoodooBackupPath { get; set; } = string.Empty;
 }

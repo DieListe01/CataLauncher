@@ -10,10 +10,14 @@ namespace CatanLauncher.Services;
 
 public sealed class GitHubReleaseUpdateService
 {
-    public async Task CheckForUpdateAsync(Window owner, LauncherConfig config)
+    public async Task CheckForUpdateAsync(Window owner, LauncherConfig config, bool isManualCheck = false)
     {
         if (!config.UpdateChecksEnabled)
+        {
+            if (isManualCheck)
+                MessageBox.Show(owner, "Update-Pruefung ist in den Einstellungen deaktiviert.", "Launcher-Update", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
+        }
 
         if (string.IsNullOrWhiteSpace(config.GitHubOwner) || string.IsNullOrWhiteSpace(config.GitHubRepository))
             return;
@@ -22,28 +26,33 @@ public sealed class GitHubReleaseUpdateService
         {
             using var http = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(6)
+                Timeout = TimeSpan.FromSeconds(20)
             };
-
             http.DefaultRequestHeaders.UserAgent.ParseAdd("CatanLauncher/1.0");
 
-            string url = $"https://api.github.com/repos/{config.GitHubOwner}/{config.GitHubRepository}/releases/latest";
-            string json = await http.GetStringAsync(url);
-
-            using JsonDocument document = JsonDocument.Parse(json);
-            JsonElement root = document.RootElement;
-
-            string latestTag = root.TryGetProperty("tag_name", out JsonElement tagElement)
-                ? tagElement.GetString() ?? string.Empty
-                : string.Empty;
+            ReleaseInfo? release = await GetReleaseAsync(http, config);
+            if (release == null || !TryParseVersion(release.TagName, out Version? latestVersion))
+            {
+                if (isManualCheck)
+                    MessageBox.Show(owner, "Online-Version konnte nicht ermittelt werden.", "Launcher-Update", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalTelemetryService.Write("update", "could-not-resolve-latest-release", config.LocalTelemetryEnabled);
+                return;
+            }
 
             Version currentVersion = AppVersionService.GetCurrentVersion();
-            if (!TryParseVersion(latestTag, out Version? latestVersion) || latestVersion <= currentVersion)
+            if (latestVersion <= currentVersion)
+            {
+                if (isManualCheck)
+                    MessageBox.Show(owner, "Du bist bereits auf der neuesten Version (" + currentVersion + ").", "Launcher-Update", MessageBoxButton.OK, MessageBoxImage.Information);
+                LocalTelemetryService.Write("update", "up-to-date " + currentVersion, config.LocalTelemetryEnabled);
                 return;
+            }
 
             string message =
                 "Neue Version verfuegbar: " + latestVersion + Environment.NewLine +
-                "Installierte Version: " + currentVersion + Environment.NewLine + Environment.NewLine +
+                "Installierte Version: " + currentVersion + Environment.NewLine +
+                "Kanal: " + NormalizeChannel(config.UpdateChannel) + Environment.NewLine + Environment.NewLine +
+                BuildReleaseNotesPreview(release.Body) + Environment.NewLine + Environment.NewLine +
                 "Jetzt Update herunterladen?";
 
             MessageBoxResult result = MessageBox.Show(owner, message, "Launcher-Update", MessageBoxButton.YesNo, MessageBoxImage.Information);
@@ -58,36 +67,130 @@ public sealed class GitHubReleaseUpdateService
                 progressWindow = CreateProgressWindow(owner, out progressBar, out progressText);
                 progressWindow.Show();
 
-                string? downloadUrl = TryGetAssetDownloadUrl(root, config.GitHubAssetName);
+                string? downloadUrl = ResolveDownloadUrl(release, config.GitHubAssetName);
                 if (!string.IsNullOrWhiteSpace(downloadUrl))
                 {
-                    IProgress<DownloadProgressInfo> progress = new Progress<DownloadProgressInfo>(info =>
-                    {
-                        UpdateProgressUi(progressBar, progressText, info);
-                    });
-
+                    IProgress<DownloadProgressInfo> progress = new Progress<DownloadProgressInfo>(info => UpdateProgressUi(progressBar, progressText, info));
                     progress.Report(DownloadProgressInfo.Status("Pruefe Release-Asset..."));
+
                     await DownloadAndStartInstallerAsync(http, downloadUrl, progress);
+                    LocalTelemetryService.Write("update", "download-started " + latestVersion, config.LocalTelemetryEnabled);
                     Application.Current.Shutdown();
                     return;
                 }
 
-                string htmlUrl = root.TryGetProperty("html_url", out JsonElement htmlElement)
-                    ? htmlElement.GetString() ?? string.Empty
-                    : string.Empty;
-
-                if (!string.IsNullOrWhiteSpace(htmlUrl))
-                    OpenUrl(htmlUrl);
+                if (!string.IsNullOrWhiteSpace(release.HtmlUrl))
+                    OpenUrl(release.HtmlUrl);
             }
             finally
             {
                 progressWindow?.Close();
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Update-Check darf den Launcher-Start niemals blockieren.
+            LocalTelemetryService.Write("update-error", ex.Message, config.LocalTelemetryEnabled);
+            if (isManualCheck)
+                MessageBox.Show(owner, "Update konnte nicht geladen werden: " + ex.Message, "Launcher-Update", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private static async Task<ReleaseInfo?> GetReleaseAsync(HttpClient http, LauncherConfig config)
+    {
+        string owner = config.GitHubOwner.Trim();
+        string repo = config.GitHubRepository.Trim();
+        string channel = NormalizeChannel(config.UpdateChannel);
+
+        if (channel == "stable")
+        {
+            string latestUrl = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+            string json = await http.GetStringAsync(latestUrl);
+            return ParseReleaseInfo(JsonDocument.Parse(json).RootElement);
+        }
+
+        string releasesUrl = $"https://api.github.com/repos/{owner}/{repo}/releases";
+        string releasesJson = await http.GetStringAsync(releasesUrl);
+        using JsonDocument releasesDocument = JsonDocument.Parse(releasesJson);
+
+        foreach (JsonElement release in releasesDocument.RootElement.EnumerateArray())
+        {
+            bool isDraft = release.TryGetProperty("draft", out JsonElement draftElement) && draftElement.GetBoolean();
+            if (isDraft)
+                continue;
+
+            // Beta-Kanal: erste nicht-draft Release (inkl. prerelease) nehmen.
+            return ParseReleaseInfo(release);
+        }
+
+        return null;
+    }
+
+    private static ReleaseInfo ParseReleaseInfo(JsonElement release)
+    {
+        string tagName = release.TryGetProperty("tag_name", out JsonElement tagElement) ? tagElement.GetString() ?? string.Empty : string.Empty;
+        string htmlUrl = release.TryGetProperty("html_url", out JsonElement htmlElement) ? htmlElement.GetString() ?? string.Empty : string.Empty;
+        string body = release.TryGetProperty("body", out JsonElement bodyElement) ? bodyElement.GetString() ?? string.Empty : string.Empty;
+
+        var assets = new List<ReleaseAsset>();
+        if (release.TryGetProperty("assets", out JsonElement assetsElement) && assetsElement.ValueKind == JsonValueKind.Array)
+        {
+            foreach (JsonElement asset in assetsElement.EnumerateArray())
+            {
+                string name = asset.TryGetProperty("name", out JsonElement nameElement) ? nameElement.GetString() ?? string.Empty : string.Empty;
+                string url = asset.TryGetProperty("browser_download_url", out JsonElement urlElement) ? urlElement.GetString() ?? string.Empty : string.Empty;
+                if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(url))
+                    assets.Add(new ReleaseAsset(name, url));
+            }
+        }
+
+        return new ReleaseInfo(tagName, htmlUrl, body, assets);
+    }
+
+    private static string NormalizeChannel(string? channel)
+    {
+        return string.Equals(channel?.Trim(), "beta", StringComparison.OrdinalIgnoreCase) ? "beta" : "stable";
+    }
+
+    private static string BuildReleaseNotesPreview(string releaseBody)
+    {
+        if (string.IsNullOrWhiteSpace(releaseBody))
+            return "Was ist neu: keine Release-Notizen vorhanden.";
+
+        string[] lines = releaseBody
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .Take(4)
+            .ToArray();
+
+        if (lines.Length == 0)
+            return "Was ist neu: keine Release-Notizen vorhanden.";
+
+        return "Was ist neu:" + Environment.NewLine + string.Join(Environment.NewLine, lines.Select(line => "- " + line));
+    }
+
+    private static string? ResolveDownloadUrl(ReleaseInfo release, string configuredAssetName)
+    {
+        string desiredName = (configuredAssetName ?? string.Empty).Trim();
+        if (!string.IsNullOrWhiteSpace(desiredName))
+        {
+            ReleaseAsset? exact = release.Assets.FirstOrDefault(asset => asset.Name.Equals(desiredName, StringComparison.OrdinalIgnoreCase));
+            if (exact != null)
+                return exact.Url;
+        }
+
+        ReleaseAsset? setup = release.Assets
+            .FirstOrDefault(asset => asset.Name.Contains("Setup", StringComparison.OrdinalIgnoreCase) &&
+                                     asset.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+        if (setup != null)
+            return setup.Url;
+
+        ReleaseAsset? exe = release.Assets.FirstOrDefault(asset => asset.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+        if (exe != null)
+            return exe.Url;
+
+        ReleaseAsset? msi = release.Assets.FirstOrDefault(asset => asset.Name.EndsWith(".msi", StringComparison.OrdinalIgnoreCase));
+        return msi?.Url;
     }
 
     private static bool TryParseVersion(string value, out Version? version)
@@ -97,60 +200,14 @@ public sealed class GitHubReleaseUpdateService
             return false;
 
         string normalized = value.Trim().TrimStart('v', 'V');
-
         int separatorIndex = normalized.IndexOf('-');
         if (separatorIndex >= 0)
             normalized = normalized[..separatorIndex];
-
         int metadataSeparatorIndex = normalized.IndexOf('+');
         if (metadataSeparatorIndex >= 0)
             normalized = normalized[..metadataSeparatorIndex];
 
         return Version.TryParse(normalized, out version);
-    }
-
-    private static string? TryGetAssetDownloadUrl(JsonElement releaseRoot, string configuredAssetName)
-    {
-        if (!releaseRoot.TryGetProperty("assets", out JsonElement assetsElement) || assetsElement.ValueKind != JsonValueKind.Array)
-            return null;
-
-        string desiredName = (configuredAssetName ?? string.Empty).Trim();
-
-        if (!string.IsNullOrWhiteSpace(desiredName))
-        {
-            foreach (JsonElement asset in assetsElement.EnumerateArray())
-            {
-                string name = asset.TryGetProperty("name", out JsonElement nameElement)
-                    ? nameElement.GetString() ?? string.Empty
-                    : string.Empty;
-
-                if (!name.Equals(desiredName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                return asset.TryGetProperty("browser_download_url", out JsonElement exactUrl)
-                    ? exactUrl.GetString()
-                    : null;
-            }
-        }
-
-        foreach (JsonElement asset in assetsElement.EnumerateArray())
-        {
-            string name = asset.TryGetProperty("name", out JsonElement nameElement)
-                ? nameElement.GetString() ?? string.Empty
-                : string.Empty;
-
-            if (!name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
-                !name.EndsWith(".msi", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            return asset.TryGetProperty("browser_download_url", out JsonElement url)
-                ? url.GetString()
-                : null;
-        }
-
-        return null;
     }
 
     private static async Task DownloadAndStartInstallerAsync(HttpClient http, string downloadUrl, IProgress<DownloadProgressInfo>? progress)
@@ -172,7 +229,6 @@ public sealed class GitHubReleaseUpdateService
         {
             byte[] buffer = new byte[1024 * 32];
             long bytesReceived = 0;
-
             progress?.Report(DownloadProgressInfo.Bytes(bytesReceived, totalBytes));
 
             while (true)
@@ -191,15 +247,6 @@ public sealed class GitHubReleaseUpdateService
         Process.Start(new ProcessStartInfo
         {
             FileName = targetPath,
-            UseShellExecute = true
-        });
-    }
-
-    private static void OpenUrl(string url)
-    {
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = url,
             UseShellExecute = true
         });
     }
@@ -232,8 +279,8 @@ public sealed class GitHubReleaseUpdateService
         {
             Title = "Launcher-Update",
             Content = panel,
-            Width = 360,
-            Height = 130,
+            Width = 380,
+            Height = 140,
             ResizeMode = ResizeMode.NoResize,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             ShowInTaskbar = false,
@@ -284,12 +331,21 @@ public sealed class GitHubReleaseUpdateService
         return bytes + " B";
     }
 
+    private static void OpenUrl(string url)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
+    }
+
+    private sealed record ReleaseInfo(string TagName, string HtmlUrl, string Body, IReadOnlyList<ReleaseAsset> Assets);
+    private sealed record ReleaseAsset(string Name, string Url);
+
     private readonly record struct DownloadProgressInfo(string StatusText, long BytesReceived, long? TotalBytes, bool HasByteProgress)
     {
-        public static DownloadProgressInfo Status(string statusText) =>
-            new(statusText, 0, null, false);
-
-        public static DownloadProgressInfo Bytes(long bytesReceived, long? totalBytes) =>
-            new("Update wird heruntergeladen", bytesReceived, totalBytes, true);
+        public static DownloadProgressInfo Status(string statusText) => new(statusText, 0, null, false);
+        public static DownloadProgressInfo Bytes(long bytesReceived, long? totalBytes) => new("Update wird heruntergeladen", bytesReceived, totalBytes, true);
     }
 }

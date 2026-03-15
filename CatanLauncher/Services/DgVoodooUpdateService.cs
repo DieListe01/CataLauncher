@@ -10,7 +10,7 @@ public sealed class DgVoodooUpdateService
     private const string LatestReleaseApiUrl = "https://api.github.com/repos/dege-diosg/dgVoodoo2/releases/latest";
     private const string FallbackPageUrl = "https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/#";
 
-    public async Task<string> InstallLatestAsync(string dgVoodooExePath)
+    public async Task<DgVoodooUpdateResult> InstallLatestAsync(string dgVoodooExePath, IProgress<string>? status = null)
     {
         if (string.IsNullOrWhiteSpace(dgVoodooExePath))
             throw new InvalidOperationException("Kein dgVoodoo-Pfad konfiguriert.");
@@ -22,9 +22,10 @@ public sealed class DgVoodooUpdateService
         if (string.IsNullOrWhiteSpace(targetDirectory) || !Directory.Exists(targetDirectory))
             throw new DirectoryNotFoundException("Der Zielordner fuer dgVoodoo2 existiert nicht.");
 
-        using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
         http.DefaultRequestHeaders.UserAgent.ParseAdd("CatanLauncher/1.0");
 
+        status?.Report("Lese aktuelle dgVoodoo-Release-Info...");
         string releaseJson = await http.GetStringAsync(LatestReleaseApiUrl);
         using JsonDocument document = JsonDocument.Parse(releaseJson);
         JsonElement root = document.RootElement;
@@ -40,20 +41,27 @@ public sealed class DgVoodooUpdateService
         string tempRoot = Path.Combine(Path.GetTempPath(), "CatanLauncher", "dgVoodooUpdate", Guid.NewGuid().ToString("N"));
         string zipPath = Path.Combine(tempRoot, "dgVoodoo_latest.zip");
         string extractPath = Path.Combine(tempRoot, "extracted");
+        string backupPath = targetDirectory.TrimEnd('\\') + "_backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
         Directory.CreateDirectory(tempRoot);
         Directory.CreateDirectory(extractPath);
 
         try
         {
+            status?.Report("Lade dgVoodoo-ZIP herunter...");
             await using (Stream zipStream = await http.GetStreamAsync(zipUrl))
             await using (var zipFile = File.Create(zipPath))
             {
                 await zipStream.CopyToAsync(zipFile);
             }
 
+            status?.Report("Erstelle Backup...");
+            CopyDirectoryRecursive(targetDirectory, backupPath);
+
+            status?.Report("Entpacke Update...");
             ZipFile.ExtractToDirectory(zipPath, extractPath, overwriteFiles: true);
 
+            status?.Report("Kopiere neue Dateien...");
             string sourceDirectory = ResolveExtractedRoot(extractPath);
             CopyDirectoryRecursive(sourceDirectory, targetDirectory);
         }
@@ -70,7 +78,22 @@ public sealed class DgVoodooUpdateService
             }
         }
 
-        return releaseVersion.TrimStart('v', 'V');
+        return new DgVoodooUpdateResult(releaseVersion.TrimStart('v', 'V'), backupPath);
+    }
+
+    public void Rollback(string dgVoodooExePath, string backupPath)
+    {
+        if (string.IsNullOrWhiteSpace(dgVoodooExePath))
+            throw new InvalidOperationException("Kein dgVoodoo-Pfad konfiguriert.");
+
+        string targetDirectory = Path.GetDirectoryName(dgVoodooExePath) ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(targetDirectory))
+            throw new InvalidOperationException("Zielordner fuer dgVoodoo2 konnte nicht ermittelt werden.");
+
+        if (string.IsNullOrWhiteSpace(backupPath) || !Directory.Exists(backupPath))
+            throw new DirectoryNotFoundException("Backup-Ordner wurde nicht gefunden.");
+
+        CopyDirectoryRecursive(backupPath, targetDirectory);
     }
 
     private static string? FindZipAssetUrl(JsonElement releaseRoot)
@@ -96,7 +119,6 @@ public sealed class DgVoodooUpdateService
             if (string.IsNullOrWhiteSpace(url))
                 continue;
 
-            // Bevorzugt stabile Pakete wie dgVoodoo2_86_5.zip (ohne dbg/dev).
             bool looksStable = name.StartsWith("dgVoodoo2_", StringComparison.OrdinalIgnoreCase) &&
                                !name.Contains("_dbg", StringComparison.OrdinalIgnoreCase) &&
                                !name.Contains("_dev", StringComparison.OrdinalIgnoreCase);
@@ -150,3 +172,5 @@ public sealed class DgVoodooUpdateService
         }
     }
 }
+
+public sealed record DgVoodooUpdateResult(string InstalledVersion, string BackupPath);

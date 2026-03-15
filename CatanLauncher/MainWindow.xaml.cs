@@ -65,7 +65,7 @@ public partial class MainWindow : Window
         try
         {
             var config = string.IsNullOrWhiteSpace(currentConfig.ConfigFilePath) ? configService.Load() : currentConfig;
-            await updateService.CheckForUpdateAsync(this, config);
+            await updateService.CheckForUpdateAsync(this, config, isManualCheck: true);
             WriteLog("Launcher-Version geprueft.");
         }
         catch (Exception ex)
@@ -182,6 +182,8 @@ public partial class MainWindow : Window
         try
         {
             EnsureExists(currentConfig.CatanExePath, "Catan.exe");
+            if (!CheckLaunchHealth())
+                return;
             runtimeService.StartFull(currentConfig.CatanExePath, currentConfig.DgVoodooExePath, currentConfig.RadminExePath);
             WriteLog("WPF-Prototyp startet Radmin, dgVoodoo2 und Catan.");
             await Task.Delay(500);
@@ -199,6 +201,8 @@ public partial class MainWindow : Window
         try
         {
             EnsureExists(currentConfig.CatanExePath, "Catan.exe");
+            if (!CheckLaunchHealth())
+                return;
             runtimeService.StartFile(currentConfig.CatanExePath);
             WriteLog("Catan wurde gestartet.");
             await Task.Delay(500);
@@ -407,6 +411,13 @@ public partial class MainWindow : Window
             "dgVoodoo2 aktiv",
             "Tool oeffnen",
             false);
+
+        InstallationDgVoodooRollbackButton.Visibility = string.IsNullOrWhiteSpace(currentConfig.LastDgVoodooBackupPath) || !Directory.Exists(currentConfig.LastDgVoodooBackupPath)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+        InstallationDgVoodooRollbackButton.ToolTip = InstallationDgVoodooRollbackButton.Visibility == Visibility.Visible
+            ? "Stellt dgVoodoo2 aus dem letzten Backup wieder her."
+            : null;
     }
 
     private void UpdateInstallationCatanCard()
@@ -702,9 +713,19 @@ public partial class MainWindow : Window
                 return;
 
             InstallationDgVoodooUpdateButton.IsEnabled = false;
-            WriteLog("Lade neueste dgVoodoo2-Version herunter...");
-            string installedVersion = await dgVoodooUpdateService.InstallLatestAsync(currentConfig.DgVoodooExePath);
-            WriteLog("dgVoodoo2 erfolgreich aktualisiert auf Version " + installedVersion + ".");
+            InstallationDgVoodooRollbackButton.IsEnabled = false;
+            var progress = new Progress<string>(message =>
+            {
+                InstallationDgVoodooHintText.Text = message;
+                WriteLog("dgVoodoo2-Update: " + message);
+            });
+
+            DgVoodooUpdateResult result = await dgVoodooUpdateService.InstallLatestAsync(currentConfig.DgVoodooExePath, progress);
+            currentConfig.LastDgVoodooBackupPath = result.BackupPath;
+            configService.Save(currentConfig);
+
+            WriteLog("dgVoodoo2 erfolgreich aktualisiert auf Version " + result.InstalledVersion + ".");
+            WriteLog("Backup gespeichert: " + result.BackupPath);
             await RefreshUiStateAsync();
         }
         catch (Exception ex)
@@ -714,6 +735,41 @@ public partial class MainWindow : Window
         finally
         {
             InstallationDgVoodooUpdateButton.IsEnabled = true;
+            InstallationDgVoodooRollbackButton.IsEnabled = true;
+        }
+    }
+
+    private async void DgVoodooRollbackButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(currentConfig.LastDgVoodooBackupPath) || !Directory.Exists(currentConfig.LastDgVoodooBackupPath))
+            {
+                ShowError("Rollback nicht moeglich", "Kein dgVoodoo-Backup gefunden.");
+                return;
+            }
+
+            MessageBoxResult confirm = MessageBox.Show(
+                this,
+                "dgVoodoo2 wird aus dem Backup wiederhergestellt:\n" + currentConfig.LastDgVoodooBackupPath + "\n\nFortfahren?",
+                "dgVoodoo2 Rollback",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            InstallationDgVoodooRollbackButton.IsEnabled = false;
+            dgVoodooUpdateService.Rollback(currentConfig.DgVoodooExePath, currentConfig.LastDgVoodooBackupPath);
+            WriteLog("dgVoodoo2 erfolgreich aus Backup wiederhergestellt.");
+            await RefreshUiStateAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowError("Rollback fehlgeschlagen", ex.Message);
+        }
+        finally
+        {
+            InstallationDgVoodooRollbackButton.IsEnabled = true;
         }
     }
 
@@ -792,6 +848,7 @@ public partial class MainWindow : Window
         ConfigureInstallationOpenButton(InstallationDgVoodooOpenButton, false, false, "dgVoodoo2", "dgVoodoo2 aktiv", "Tool oeffnen");
         InstallationRadminUpdateButton.Visibility = Visibility.Collapsed;
         InstallationDgVoodooUpdateButton.Visibility = Visibility.Collapsed;
+        InstallationDgVoodooRollbackButton.Visibility = Visibility.Collapsed;
         HideInlineBadge(LanStatusBadge, LanStatusBadgeText);
         HideInlineBadge(VpnStatusBadge, VpnStatusBadgeText);
         HideInlineBadge(DgVoodooVersionBadge, DgVoodooVersionBadgeText);
@@ -1189,6 +1246,33 @@ public partial class MainWindow : Window
         string line = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message + Environment.NewLine;
         LogTextBox.AppendText(line);
         LogTextBox.ScrollToEnd();
+        LocalTelemetryService.Write("ui-log", message, currentConfig.LocalTelemetryEnabled);
+    }
+
+    private bool CheckLaunchHealth()
+    {
+        string catanDirectory = Path.GetDirectoryName(currentConfig.CatanExePath) ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(catanDirectory) || !Directory.Exists(catanDirectory))
+            return true;
+
+        try
+        {
+            string probePath = Path.Combine(catanDirectory, ".catanlauncher-health-" + Guid.NewGuid().ToString("N") + ".tmp");
+            using var stream = new FileStream(probePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 1, FileOptions.DeleteOnClose);
+            stream.WriteByte(0);
+            return true;
+        }
+        catch
+        {
+            MessageBoxResult result = MessageBox.Show(
+                this,
+                "Warnung: Keine sicheren Schreibrechte im Catan-Ordner erkannt.\nDer Start kann funktionieren, aber Updates/Saves koennen scheitern.\n\nTrotzdem starten?",
+                "Health-Check",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            return result == MessageBoxResult.Yes;
+        }
     }
 
     private void OpenUrl(string url)

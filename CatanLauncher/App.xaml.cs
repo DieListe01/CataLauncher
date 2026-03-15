@@ -30,6 +30,9 @@ public partial class App : Application
         var updateService = new GitHubReleaseUpdateService();
 
         var config = configService.Load();
-        await updateService.CheckForUpdateAsync(owner, config);
+        if (!config.AutoCheckAtStartup)
+            return;
+
+        await updateService.CheckForUpdateAsync(owner, config, isManualCheck: false);
     }
 }

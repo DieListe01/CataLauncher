@@ -25,7 +25,15 @@ public partial class SettingsWindow : Window
             DgVoodooExePath = config.DgVoodooExePath,
             RadminExePath = config.RadminExePath,
             MusicEnabled = config.MusicEnabled,
-            MusicVolume = config.MusicVolume
+            MusicVolume = config.MusicVolume,
+            UpdateChecksEnabled = config.UpdateChecksEnabled,
+            AutoCheckAtStartup = config.AutoCheckAtStartup,
+            UpdateChannel = config.UpdateChannel,
+            LocalTelemetryEnabled = config.LocalTelemetryEnabled,
+            GitHubOwner = config.GitHubOwner,
+            GitHubRepository = config.GitHubRepository,
+            GitHubAssetName = config.GitHubAssetName,
+            LastDgVoodooBackupPath = config.LastDgVoodooBackupPath
         };
 
         CatanPathTextBox.Text = Config.CatanExePath;
@@ -33,6 +41,9 @@ public partial class SettingsWindow : Window
         RadminPathTextBox.Text = Config.RadminExePath;
         MusicEnabledCheckBox.IsChecked = Config.MusicEnabled;
         MusicVolumeSlider.Value = Config.MusicVolume;
+        AutoCheckAtStartupCheckBox.IsChecked = Config.AutoCheckAtStartup;
+        LocalTelemetryCheckBox.IsChecked = Config.LocalTelemetryEnabled;
+        UpdateChannelComboBox.SelectedIndex = string.Equals(Config.UpdateChannel, "beta", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
         UpdateVolumeText();
     }
 
@@ -90,9 +101,20 @@ public partial class SettingsWindow : Window
         Config.RadminExePath = radminExe;
         Config.MusicEnabled = MusicEnabledCheckBox.IsChecked == true;
         Config.MusicVolume = (int)Math.Round(MusicVolumeSlider.Value);
+        Config.AutoCheckAtStartup = AutoCheckAtStartupCheckBox.IsChecked == true;
+        Config.LocalTelemetryEnabled = LocalTelemetryCheckBox.IsChecked == true;
+        Config.UpdateChannel = GetSelectedUpdateChannel();
 
         DialogResult = true;
         Close();
+    }
+
+    private string GetSelectedUpdateChannel()
+    {
+        if (UpdateChannelComboBox.SelectedItem is ComboBoxItem item)
+            return string.Equals(item.Content?.ToString(), "beta", StringComparison.OrdinalIgnoreCase) ? "beta" : "stable";
+
+        return "stable";
     }
 
     private void BrowseForExe(System.Windows.Controls.TextBox target, string title, params string[] expectedNames)
