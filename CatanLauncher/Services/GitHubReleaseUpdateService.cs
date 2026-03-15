@@ -51,15 +51,22 @@ public sealed class GitHubReleaseUpdateService
                 return;
 
             Window? progressWindow = null;
+            ProgressBar? progressBar = null;
+            TextBlock? progressText = null;
             try
             {
-                progressWindow = CreateProgressWindow(owner);
+                progressWindow = CreateProgressWindow(owner, out progressBar, out progressText);
                 progressWindow.Show();
 
                 string? downloadUrl = TryGetAssetDownloadUrl(root, config.GitHubAssetName);
                 if (!string.IsNullOrWhiteSpace(downloadUrl))
                 {
-                    await DownloadAndStartInstallerAsync(http, downloadUrl);
+                    var progress = new Progress<DownloadProgressInfo>(info =>
+                    {
+                        UpdateProgressUi(progressBar, progressText, info);
+                    });
+
+                    await DownloadAndStartInstallerAsync(http, downloadUrl, progress);
                     Application.Current.Shutdown();
                     return;
                 }
@@ -145,7 +152,7 @@ public sealed class GitHubReleaseUpdateService
         return null;
     }
 
-    private static async Task DownloadAndStartInstallerAsync(HttpClient http, string downloadUrl)
+    private static async Task DownloadAndStartInstallerAsync(HttpClient http, string downloadUrl, IProgress<DownloadProgressInfo>? progress)
     {
         string fileName = Path.GetFileName(new Uri(downloadUrl).AbsolutePath);
         if (string.IsNullOrWhiteSpace(fileName))
@@ -153,10 +160,28 @@ public sealed class GitHubReleaseUpdateService
 
         string targetPath = Path.Combine(Path.GetTempPath(), fileName);
 
-        await using (Stream source = await http.GetStreamAsync(downloadUrl))
+        using HttpResponseMessage response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+        long? totalBytes = response.Content.Headers.ContentLength;
+
+        await using (Stream source = await response.Content.ReadAsStreamAsync())
         await using (var target = File.Create(targetPath))
         {
-            await source.CopyToAsync(target);
+            byte[] buffer = new byte[1024 * 32];
+            long bytesReceived = 0;
+
+            progress?.Report(new DownloadProgressInfo(bytesReceived, totalBytes));
+
+            while (true)
+            {
+                int read = await source.ReadAsync(buffer.AsMemory(0, buffer.Length));
+                if (read <= 0)
+                    break;
+
+                await target.WriteAsync(buffer.AsMemory(0, read));
+                bytesReceived += read;
+                progress?.Report(new DownloadProgressInfo(bytesReceived, totalBytes));
+            }
         }
 
         Process.Start(new ProcessStartInfo
@@ -175,16 +200,18 @@ public sealed class GitHubReleaseUpdateService
         });
     }
 
-    private static Window CreateProgressWindow(Window owner)
+    private static Window CreateProgressWindow(Window owner, out ProgressBar progressBar, out TextBlock messageText)
     {
-        var progressBar = new ProgressBar
+        progressBar = new ProgressBar
         {
             IsIndeterminate = true,
+            Minimum = 0,
+            Maximum = 100,
             Height = 14,
             Margin = new Thickness(0, 0, 0, 12)
         };
 
-        var messageText = new TextBlock
+        messageText = new TextBlock
         {
             Text = "Update wird heruntergeladen. Bitte kurz warten...",
             TextWrapping = TextWrapping.Wrap
@@ -209,4 +236,42 @@ public sealed class GitHubReleaseUpdateService
             Owner = owner
         };
     }
+
+    private static void UpdateProgressUi(ProgressBar? progressBar, TextBlock? progressText, DownloadProgressInfo progress)
+    {
+        if (progressBar == null || progressText == null)
+            return;
+
+        if (progress.TotalBytes.HasValue && progress.TotalBytes.Value > 0)
+        {
+            double percent = (double)progress.BytesReceived / progress.TotalBytes.Value * 100.0;
+            progressBar.IsIndeterminate = false;
+            progressBar.Value = Math.Clamp(percent, 0, 100);
+            progressText.Text = "Update wird heruntergeladen: " +
+                                progressBar.Value.ToString("0") + " % (" +
+                                FormatBytes(progress.BytesReceived) + " / " +
+                                FormatBytes(progress.TotalBytes.Value) + ")";
+            return;
+        }
+
+        progressBar.IsIndeterminate = true;
+        progressText.Text = "Update wird heruntergeladen: " + FormatBytes(progress.BytesReceived);
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        const double kb = 1024d;
+        const double mb = kb * 1024d;
+        const double gb = mb * 1024d;
+
+        if (bytes >= gb)
+            return (bytes / gb).ToString("0.00") + " GB";
+        if (bytes >= mb)
+            return (bytes / mb).ToString("0.00") + " MB";
+        if (bytes >= kb)
+            return (bytes / kb).ToString("0.0") + " KB";
+        return bytes + " B";
+    }
+
+    private readonly record struct DownloadProgressInfo(long BytesReceived, long? TotalBytes);
 }
