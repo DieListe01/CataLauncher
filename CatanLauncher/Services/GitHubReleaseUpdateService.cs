@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 using CatanLauncher.Models;
 
 namespace CatanLauncher.Services;
@@ -49,20 +50,31 @@ public sealed class GitHubReleaseUpdateService
             if (result != MessageBoxResult.Yes)
                 return;
 
-            string? downloadUrl = TryGetAssetDownloadUrl(root, config.GitHubAssetName);
-            if (!string.IsNullOrWhiteSpace(downloadUrl))
+            Window? progressWindow = null;
+            try
             {
-                await DownloadAndStartInstallerAsync(http, downloadUrl);
-                Application.Current.Shutdown();
-                return;
+                progressWindow = CreateProgressWindow(owner);
+                progressWindow.Show();
+
+                string? downloadUrl = TryGetAssetDownloadUrl(root, config.GitHubAssetName);
+                if (!string.IsNullOrWhiteSpace(downloadUrl))
+                {
+                    await DownloadAndStartInstallerAsync(http, downloadUrl);
+                    Application.Current.Shutdown();
+                    return;
+                }
+
+                string htmlUrl = root.TryGetProperty("html_url", out JsonElement htmlElement)
+                    ? htmlElement.GetString() ?? string.Empty
+                    : string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(htmlUrl))
+                    OpenUrl(htmlUrl);
             }
-
-            string htmlUrl = root.TryGetProperty("html_url", out JsonElement htmlElement)
-                ? htmlElement.GetString() ?? string.Empty
-                : string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(htmlUrl))
-                OpenUrl(htmlUrl);
+            finally
+            {
+                progressWindow?.Close();
+            }
         }
         catch
         {
@@ -161,5 +173,40 @@ public sealed class GitHubReleaseUpdateService
             FileName = url,
             UseShellExecute = true
         });
+    }
+
+    private static Window CreateProgressWindow(Window owner)
+    {
+        var progressBar = new ProgressBar
+        {
+            IsIndeterminate = true,
+            Height = 14,
+            Margin = new Thickness(0, 0, 0, 12)
+        };
+
+        var messageText = new TextBlock
+        {
+            Text = "Update wird heruntergeladen. Bitte kurz warten...",
+            TextWrapping = TextWrapping.Wrap
+        };
+
+        var panel = new StackPanel
+        {
+            Margin = new Thickness(16)
+        };
+        panel.Children.Add(progressBar);
+        panel.Children.Add(messageText);
+
+        return new Window
+        {
+            Title = "Launcher-Update",
+            Content = panel,
+            Width = 360,
+            Height = 130,
+            ResizeMode = ResizeMode.NoResize,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            ShowInTaskbar = false,
+            Owner = owner
+        };
     }
 }
