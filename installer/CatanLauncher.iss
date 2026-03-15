@@ -66,6 +66,54 @@ Name: "{autodesktop}\CatanLauncher"; Filename: "{app}\CatanLauncher.exe"; Tasks:
 
 [Run]
 Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Installiere Microsoft Visual C++ Runtime..."; Flags: waituntilterminated runhidden; Components: prereqs
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$ProgressPreference='SilentlyContinue';$out=Join-Path $env:TEMP 'RadminVPNSetup.exe';try{Invoke-WebRequest -Uri '{#RadminSetupUrl}' -OutFile $out -ErrorAction Stop;Start-Process -FilePath $out -Wait}catch{Start-Process '{#RadminFallbackUrl}' | Out-Null;exit 0}"""; StatusMsg: "Lade Radmin VPN herunter und starte die Installation..."; Description: "Radmin VPN installieren"; Flags: waituntilterminated postinstall skipifsilent; Tasks: installradmin
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$ProgressPreference='SilentlyContinue';$zip=Join-Path $env:TEMP 'dgVoodoo2_86_5.zip';$dest='{app}\Tools\dgVoodoo2';try{Invoke-WebRequest -Uri '{#DgVoodooZipUrl}' -OutFile $zip -ErrorAction Stop;New-Item -ItemType Directory -Force -Path $dest | Out-Null;Expand-Archive -Path $zip -DestinationPath $dest -Force}catch{Start-Process '{#DgVoodooFallbackUrl}' | Out-Null;exit 0}"""; StatusMsg: "Lade dgVoodoo2 herunter und entpacke es..."; Description: "dgVoodoo2 herunterladen und entpacken"; Flags: waituntilterminated postinstall skipifsilent; Tasks: installdgvoodoo
 Filename: "{app}\CatanLauncher.exe"; Description: "CatanLauncher starten"; Flags: nowait postinstall skipifsilent
+
+[Code]
+procedure RunOptionalToolInstallers;
+var
+  ScriptPath: string;
+  ScriptText: string;
+  ResultCode: Integer;
+begin
+  if WizardIsTaskSelected('installradmin') then
+  begin
+    ScriptPath := ExpandConstant('{tmp}\install_radmin.ps1');
+    ScriptText :=
+      '$ProgressPreference=''SilentlyContinue'';' +
+      '$out=Join-Path $env:TEMP ''RadminVPNSetup.exe'';' +
+      'try {' +
+      ' Invoke-WebRequest -Uri ''{#RadminSetupUrl}'' -OutFile $out -ErrorAction Stop;' +
+      ' Start-Process -FilePath $out -Wait' +
+      '} catch {' +
+      ' Start-Process ''{#RadminFallbackUrl}'' | Out-Null' +
+      '}';
+
+    SaveStringToFile(ScriptPath, ScriptText, False);
+    Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + ScriptPath + '"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if WizardIsTaskSelected('installdgvoodoo') then
+  begin
+    ScriptPath := ExpandConstant('{tmp}\install_dgvoodoo.ps1');
+    ScriptText :=
+      '$ProgressPreference=''SilentlyContinue'';' +
+      '$zip=Join-Path $env:TEMP ''dgVoodoo2_86_5.zip'';' +
+      '$dest=''' + ExpandConstant('{app}\Tools\dgVoodoo2') + ''';' +
+      'try {' +
+      ' Invoke-WebRequest -Uri ''{#DgVoodooZipUrl}'' -OutFile $zip -ErrorAction Stop;' +
+      ' New-Item -ItemType Directory -Force -Path $dest | Out-Null;' +
+      ' Expand-Archive -Path $zip -DestinationPath $dest -Force' +
+      '} catch {' +
+      ' Start-Process ''{#DgVoodooFallbackUrl}'' | Out-Null' +
+      '}';
+
+    SaveStringToFile(ScriptPath, ScriptText, False);
+    Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + ScriptPath + '"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    RunOptionalToolInstallers;
+end;
