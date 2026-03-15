@@ -60,3 +60,16 @@ Vor einem Push bitte mindestens:
 
 1. `dotnet build Catan.slnx`
 
+## Optional: Code Signing In GitHub Actions
+
+Wenn Release-Installer signiert werden sollen, setze in GitHub unter
+`Settings -> Secrets and variables -> Actions` folgende Repository-Secrets:
+
+- `WINDOWS_CERTIFICATE_BASE64`
+  - Base64-Inhalt deiner `.pfx` Datei
+- `WINDOWS_CERTIFICATE_PASSWORD`
+  - Passwort der `.pfx` Datei
+- `WINDOWS_TIMESTAMP_URL` (optional)
+  - Standard ist `http://timestamp.digicert.com`
+
+Ohne diese Secrets laufen die Workflows weiter, aber ohne Signierung.
