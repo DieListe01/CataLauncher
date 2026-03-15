@@ -81,10 +81,10 @@ begin
     WizardForm.DirEdit.Text := AddBackslash(PreferredBaseDir) + 'CatanLauncher';
 
   DirHintLabel := TNewStaticText.Create(WizardForm.SelectDirPage);
-  DirHintLabel.Parent := WizardForm.SelectDirPage.Surface;
+  DirHintLabel.Parent := WizardForm.DirEdit.Parent;
   DirHintLabel.Top := WizardForm.DirEdit.Top + WizardForm.DirEdit.Height + ScaleY(10);
   DirHintLabel.Left := WizardForm.DirEdit.Left;
-  DirHintLabel.Width := WizardForm.SelectDirPage.Surface.Width - WizardForm.DirEdit.Left;
+  DirHintLabel.Width := WizardForm.DirEdit.Width;
   DirHintLabel.Height := ScaleY(30);
   DirHintLabel.Caption :=
     'Tipp: Du kannst den Zielpfad direkt eintippen. ' +
