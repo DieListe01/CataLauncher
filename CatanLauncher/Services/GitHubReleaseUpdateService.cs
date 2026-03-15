@@ -74,8 +74,16 @@ public sealed class GitHubReleaseUpdateService
     private static Version GetCurrentVersion()
     {
         Assembly assembly = Assembly.GetExecutingAssembly();
-        Version? version = assembly.GetName().Version;
-        return version ?? new Version(0, 0, 0, 0);
+
+        string? informationalVersion = assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion;
+
+        if (TryParseVersion(informationalVersion ?? string.Empty, out Version? parsedInformationalVersion))
+            return parsedInformationalVersion ?? new Version(0, 0, 0, 0);
+
+        Version? assemblyVersion = assembly.GetName().Version;
+        return assemblyVersion ?? new Version(0, 0, 0, 0);
     }
 
     private static bool TryParseVersion(string value, out Version? version)
@@ -85,9 +93,14 @@ public sealed class GitHubReleaseUpdateService
             return false;
 
         string normalized = value.Trim().TrimStart('v', 'V');
+
         int separatorIndex = normalized.IndexOf('-');
         if (separatorIndex >= 0)
             normalized = normalized[..separatorIndex];
+
+        int metadataSeparatorIndex = normalized.IndexOf('+');
+        if (metadataSeparatorIndex >= 0)
+            normalized = normalized[..metadataSeparatorIndex];
 
         return Version.TryParse(normalized, out version);
     }
