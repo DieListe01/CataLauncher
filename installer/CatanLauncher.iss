@@ -16,6 +16,8 @@
 
 #define RadminSetupUrl "https://download.radmin-vpn.com/download/files/Radmin_VPN_2.0.4899.9.exe"
 #define DgVoodooZipUrl "https://dege.freeweb.hu/dgVoodoo2/bin/dgVoodoo2_86_5.zip"
+#define RadminFallbackUrl "https://www.radmin-vpn.com/de/"
+#define DgVoodooFallbackUrl "https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/#"
 
 [Setup]
 AppId={{A1D315A8-A0F3-4B15-A8C0-2F8F0F9DDF63}
@@ -64,6 +66,6 @@ Name: "{autodesktop}\CatanLauncher"; Filename: "{app}\CatanLauncher.exe"; Tasks:
 
 [Run]
 Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Installiere Microsoft Visual C++ Runtime..."; Flags: waituntilterminated runhidden; Components: prereqs
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue';$out=Join-Path $env:TEMP 'RadminVPNSetup.exe';Invoke-WebRequest -Uri '{#RadminSetupUrl}' -OutFile $out;Start-Process -FilePath $out -Wait"""; StatusMsg: "Lade Radmin VPN herunter und starte die Installation..."; Description: "Radmin VPN installieren"; Flags: waituntilterminated postinstall skipifsilent; Tasks: installradmin
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue';$zip=Join-Path $env:TEMP 'dgVoodoo2_86_5.zip';$dest='{app}\Tools\dgVoodoo2';Invoke-WebRequest -Uri '{#DgVoodooZipUrl}' -OutFile $zip;New-Item -ItemType Directory -Force -Path $dest | Out-Null;Expand-Archive -Path $zip -DestinationPath $dest -Force"""; StatusMsg: "Lade dgVoodoo2 herunter und entpacke es..."; Description: "dgVoodoo2 herunterladen und entpacken"; Flags: waituntilterminated postinstall skipifsilent; Tasks: installdgvoodoo
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$ProgressPreference='SilentlyContinue';$out=Join-Path $env:TEMP 'RadminVPNSetup.exe';try{Invoke-WebRequest -Uri '{#RadminSetupUrl}' -OutFile $out -ErrorAction Stop;Start-Process -FilePath $out -Wait}catch{Start-Process '{#RadminFallbackUrl}' | Out-Null;exit 0}"""; StatusMsg: "Lade Radmin VPN herunter und starte die Installation..."; Description: "Radmin VPN installieren"; Flags: waituntilterminated postinstall skipifsilent; Tasks: installradmin
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -Command ""$ProgressPreference='SilentlyContinue';$zip=Join-Path $env:TEMP 'dgVoodoo2_86_5.zip';$dest='{app}\Tools\dgVoodoo2';try{Invoke-WebRequest -Uri '{#DgVoodooZipUrl}' -OutFile $zip -ErrorAction Stop;New-Item -ItemType Directory -Force -Path $dest | Out-Null;Expand-Archive -Path $zip -DestinationPath $dest -Force}catch{Start-Process '{#DgVoodooFallbackUrl}' | Out-Null;exit 0}"""; StatusMsg: "Lade dgVoodoo2 herunter und entpacke es..."; Description: "dgVoodoo2 herunterladen und entpacken"; Flags: waituntilterminated postinstall skipifsilent; Tasks: installdgvoodoo
 Filename: "{app}\CatanLauncher.exe"; Description: "CatanLauncher starten"; Flags: nowait postinstall skipifsilent
