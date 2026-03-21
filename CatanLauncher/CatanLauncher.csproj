@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -8,11 +7,10 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>CatanLauncher</AssemblyName>
     <ApplicationIcon>Assets\catan_icon.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Assets\catan_icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -30,7 +28,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <Target Name="RemoveLegacyLauncherArtifacts" BeforeTargets="PrepareForBuild">
     <ItemGroup>
       <LegacyLauncherArtifacts Include="$(BaseIntermediateOutputPath)Catan.WpfLauncher*" />
@@ -46,5 +43,4 @@
     </ItemGroup>
     <Delete Files="@(LegacyLauncherArtifacts)" ContinueOnError="true" />
   </Target>
-
 </Project>
