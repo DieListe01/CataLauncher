@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>CatanLauncher</AssemblyName>
     <ApplicationIcon>Assets\catan_icon.ico</ApplicationIcon>
-    <Version>2.0.1</Version>
+    <Version>2.0.3</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
