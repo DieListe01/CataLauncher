@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
@@ -104,12 +105,12 @@ public sealed class GitHubReleaseUpdateService
         if (channel == "stable")
         {
             string latestUrl = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
-            string json = await http.GetStringAsync(latestUrl);
+            string json = await GetGitHubJsonAsync(http, latestUrl);
             return ParseReleaseInfo(JsonDocument.Parse(json).RootElement);
         }
 
         string releasesUrl = $"https://api.github.com/repos/{owner}/{repo}/releases";
-        string releasesJson = await http.GetStringAsync(releasesUrl);
+        string releasesJson = await GetGitHubJsonAsync(http, releasesUrl);
         using JsonDocument releasesDocument = JsonDocument.Parse(releasesJson);
 
         foreach (JsonElement release in releasesDocument.RootElement.EnumerateArray())
@@ -123,6 +124,49 @@ public sealed class GitHubReleaseUpdateService
         }
 
         return null;
+    }
+
+    private static async Task<string> GetGitHubJsonAsync(HttpClient http, string url)
+    {
+        using HttpResponseMessage response = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+        string body = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode)
+            return body;
+
+        if (response.StatusCode == HttpStatusCode.Forbidden && IsRateLimitExceeded(response, body))
+            throw new InvalidOperationException(BuildRateLimitExceededMessage(response));
+
+        throw new HttpRequestException(
+            $"GitHub-Antwort: {(int)response.StatusCode} {response.ReasonPhrase}",
+            null,
+            response.StatusCode);
+    }
+
+    private static bool IsRateLimitExceeded(HttpResponseMessage response, string body)
+    {
+        if (response.Headers.TryGetValues("X-RateLimit-Remaining", out IEnumerable<string>? values) &&
+            values.Any(value => value == "0"))
+        {
+            return true;
+        }
+
+        return body.Contains("rate limit exceeded", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string BuildRateLimitExceededMessage(HttpResponseMessage response)
+    {
+        const string baseMessage = "GitHub blockiert die Update-Pruefung gerade, weil das Stundenlimit fuer anonyme API-Anfragen erreicht wurde.";
+
+        if (!response.Headers.TryGetValues("X-RateLimit-Reset", out IEnumerable<string>? values))
+            return baseMessage + " Bitte spaeter erneut versuchen.";
+
+        string? resetValue = values.FirstOrDefault();
+        if (!long.TryParse(resetValue, out long resetUnixSeconds))
+            return baseMessage + " Bitte spaeter erneut versuchen.";
+
+        DateTimeOffset resetTime = DateTimeOffset.FromUnixTimeSeconds(resetUnixSeconds).ToLocalTime();
+        return baseMessage + " Bitte ab " + resetTime.ToString("HH:mm") + " erneut versuchen.";
     }
 
     private static ReleaseInfo ParseReleaseInfo(JsonElement release)
