@@ -12,3 +12,10 @@ obj/
 *.pdb
 
 TestResults/
+
+# ReleasePilot defaults
+.vscode/
+artifacts/
+
+# ReleasePilot defaults
+obj_verify/
